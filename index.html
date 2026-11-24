@@ -92,6 +92,7 @@ input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);ba
 
   <section id="v-home" class="view hidden">
     <div class="card" id="hero"><div class="shimmer"></div><div class="shimmer" style="width:60%"></div></div>
+    <div class="card hidden" id="liveAcct"></div>
     <div class="grid2" id="gauges"></div>
     <div class="grid2" id="classes" style="margin-top:12px"></div>
     <div id="openList"></div>
@@ -102,6 +103,15 @@ input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);ba
     <div class="chips" id="cls"></div>
     <div class="chips" id="sts"></div>
     <div id="tlist"></div>
+  </section>
+
+  <section id="v-results" class="view hidden">
+    <div class="chips" id="rcls"></div>
+    <div class="card" id="rhero"></div>
+    <div class="grid2" id="rsplit"></div>
+    <div class="card"><div class="k">Last 14 days</div><div id="rdays"></div></div>
+    <div class="card"><div class="k">By market</div><div id="rclass"></div></div>
+    <div class="card" id="rbest"></div>
   </section>
 
   <section id="v-journal" class="view hidden"><div id="jlist" class="tl"></div></section>
@@ -115,6 +125,7 @@ input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);ba
 <nav id="nav" class="hidden">
   <button data-v="home" class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Overview</button>
   <button data-v="trades"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>Trades<span class="badge hidden" id="badge">0</span></button>
+  <button data-v="results"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Results</button>
   <button data-v="journal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/></svg>Journal</button>
   <button data-v="rules"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Scores</button>
 </nav>
@@ -126,16 +137,16 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const md = s => DOMPurify.sanitize(marked.parse(s || ""));
 const money = (v, sign=true) => v==null ? "—" : (sign && v>0 ? "+" : v<0 ? "−" : "") + "$" + Math.abs(+v).toFixed(2);
 const CLASSES = {all:"All", stock:"Stocks", forex:"Forex", commodity:"Commodities", crypto:"Crypto"};
-const STATUSES = {open:"Open", proposed:"Waiting", closed:"Closed", cancelled:"History"};
+const STATUSES = {all:"All", open:"Open", proposed:"Waiting", closed:"Closed", cancelled:"History"};
 const ICON = {
   stock:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><path d="M6 3v4M6 15v6M18 3v6M18 17v4M12 6v3M12 17v4"/><rect x="4" y="7" width="4" height="8" rx="1"/><rect x="16" y="9" width="4" height="8" rx="1"/><rect x="10" y="9" width="4" height="8" rx="1"/></svg>`,
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-let state = {cls:"all", st:"open", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
+let state = {rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
-function show(v){state.view=v;document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
+function show(v){state.view=v;if(v==="results")renderResults();document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
 $("#refresh").onclick=()=>{load();toast("Refreshed");};
@@ -251,9 +262,9 @@ function chips(el, map, key, counts){
 }
 function renderTrades(){
   const inCls=t=>state.cls==="all"||t.asset_class===state.cls;
-  const cnt={}; Object.keys(STATUSES).forEach(s=>cnt[s]=state.trades.filter(t=>inCls(t)&&t.status===s).length);
+  const cnt={}; Object.keys(STATUSES).forEach(s=>cnt[s]=state.trades.filter(t=>inCls(t)&&(s==="all"||t.status===s)).length);
   chips($("#cls"), CLASSES, "cls"); chips($("#sts"), STATUSES, "st", cnt);
-  const list = state.trades.filter(t=>inCls(t)&&t.status===state.st);
+  const list = state.trades.filter(t=>inCls(t)&&(state.st==="all"||t.status===state.st)).sort((a,b)=>({open:0,proposed:1,closed:2,cancelled:3}[a.status]-{open:0,proposed:1,closed:2,cancelled:3}[b.status])||new Date(b.closed_at||b.opened_at)-new Date(a.closed_at||a.opened_at));
   $("#tlist").innerHTML = list.length ? list.map(tradeCard).join("") : `<div class="card empty">Nothing ${STATUSES[state.st].toLowerCase()} here yet.</div>`;
 }
 function renderJournal(){
@@ -268,6 +279,59 @@ function renderScores(){
   $("#lessons").innerHTML = md((state.snap.lessons||{}).markdown);
 }
 
+/* ---------- results ---------- */
+function renderResults(){
+  chips($("#rcls"), CLASSES, "rcls"); $("#rcls").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.rcls=b.dataset.k;renderResults();});
+  const C=state.trades.filter(t=>t.status==="closed"&&(state.rcls==="all"||t.asset_class===state.rcls));
+  const gains=C.filter(t=>t.pnl_usd>0).reduce((s,t)=>s+ +t.pnl_usd,0), losses=C.filter(t=>t.pnl_usd<0).reduce((s,t)=>s+ +t.pnl_usd,0), net=gains+losses;
+  const wins=C.filter(t=>t.pnl_usd>0).length, pf=losses?gains/Math.abs(losses):null;
+  $("#rhero").innerHTML=`<div class="k">Net result${state.rcls!=="all"?" · "+CLASSES[state.rcls]:""}</div><div class="big ${net>=0?"pos":"neg"}">${money(net)}</div>
+    <small class="soft">${C.length} closed trades · ${C.length?Math.round(100*wins/C.length):0}% winners${pf!=null?` · profit factor ${pf.toFixed(2)}`:""}</small>
+    <div style="display:flex;height:12px;border-radius:7px;overflow:hidden;margin-top:12px;background:#223043"><div style="width:${gains+Math.abs(losses)?100*gains/(gains+Math.abs(losses)):0}%;background:var(--green);transition:width 1s"></div><div style="flex:1;background:${losses?"var(--red)":"transparent"}"></div></div>`;
+  $("#rsplit").innerHTML=`<div class="card"><div class="k">Gained</div><div class="pos" style="font-size:24px;font-weight:800">${money(gains)}</div><small class="soft">${wins} winning trades</small></div>
+    <div class="card"><div class="k">Lost</div><div class="neg" style="font-size:24px;font-weight:800">${money(losses)}</div><small class="soft">${C.length-wins} losing trades</small></div>`;
+  const days=[...Array(14)].map((_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-13+i);return d;});
+  const byDay=days.map(d=>C.filter(t=>t.closed_at&&new Date(t.closed_at).toDateString()===d.toDateString()).reduce((s,t)=>s+ +t.pnl_usd,0));
+  const mx=Math.max(1,...byDay.map(Math.abs));
+  $("#rdays").innerHTML=`<svg viewBox="0 0 280 110" width="100%" height="120"><line x1="0" x2="280" y1="55" y2="55" stroke="#223043"/>${byDay.map((v,i)=>{const h=Math.abs(v)/mx*48,x=i*20+3;return `<rect x="${x}" y="${v>=0?55-h:55}" width="14" height="${Math.max(h,v?2:0)}" rx="3" fill="${v>=0?"#34d399":"#f87171"}"><animate attributeName="height" from="0" to="${Math.max(h,v?2:0)}" dur=".8s" fill="freeze"/></rect>`}).join("")}
+    <text x="0" y="108" font-size="9" fill="#5d6f84">${days[0].toLocaleDateString([], {day:"numeric",month:"short"})}</text><text x="280" y="108" font-size="9" fill="#5d6f84" text-anchor="end">today</text></svg>`;
+  $("#rclass").innerHTML=["forex","commodity","stock","crypto"].map(k=>{const T=state.trades.filter(t=>t.status==="closed"&&t.asset_class===k);const n=T.reduce((s,t)=>s+ +t.pnl_usd,0);
+    return `<div class="row between" style="margin:10px 0"><div class="row"><div class="ico ${k}" style="width:30px;height:30px">${ICON[k].replace(/22/g,"16")}</div>${CLASSES[k]} <small class="soft">${T.length}</small></div><b class="${n>0?"pos":n<0?"neg":"soft"}">${T.length?money(n):"—"}</b></div>`;}).join("")
+    + (()=>{const L=C.filter(t=>t.side==="buy"),S=C.filter(t=>t.side==="sell"),sum=a=>a.reduce((s,t)=>s+ +t.pnl_usd,0);
+      return `<div class="row between" style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px"><span>Long (buy) <small class="soft">${L.length}</small></span><b class="${sum(L)>=0?"pos":"neg"}">${L.length?money(sum(L)):"—"}</b></div>
+      <div class="row between" style="margin-top:8px"><span>Short (sell) <small class="soft">${S.length}</small></span><b class="${sum(S)>=0?"pos":"neg"}">${S.length?money(sum(S)):"—"}</b></div>`})();
+  const sorted=[...C].sort((a,b)=>b.pnl_usd-a.pnl_usd);
+  $("#rbest").innerHTML=C.length?`<div class="k">Best and worst</div><div class="row between" style="margin-top:8px"><span>🏆 ${esc(sorted[0].instrument.replace("_","/"))} ${sorted[0].side}</span><b class="pos">${money(sorted[0].pnl_usd)}</b></div><div class="row between" style="margin-top:6px"><span>⚠️ ${esc(sorted.at(-1).instrument.replace("_","/"))} ${sorted.at(-1).side}</span><b class="neg">${money(sorted.at(-1).pnl_usd)}</b></div>`:`<div class="empty">Results appear as trades close.</div>`;
+}
+
+/* ---------- live figures (Capital.com demo, read-only) ---------- */
+const EPIC=i=>({XAU_USD:"GOLD",XAG_USD:"SILVER"}[i]||i.replace("_",""));
+async function pollLive(){
+  const open=state.trades.filter(t=>t.status==="open"); if(!open.length||document.hidden) return;
+  const {data:{session}}=await sb.auth.getSession(); if(!session) return;
+  const epics=[...new Set(open.map(t=>EPIC(t.instrument)))].join(",");
+  try{
+    const r=await fetch(`${window.TM.SUPABASE_URL}/functions/v1/live?epics=${epics}`,{headers:{Authorization:"Bearer "+session.access_token,apikey:window.TM.SUPABASE_ANON_KEY}});
+    const j=await r.json(); if(!r.ok) throw new Error(j.error||r.status);
+    state.live=j; state.liveAt=Date.now();
+    const byDeal=Object.fromEntries(j.positions.map(p=>[p.dealId,p]));
+    open.forEach(t=>{
+      const p=t.deal_id&&byDeal[t.deal_id];
+      if(p){ t.last_price=(p.direction==="BUY"?p.bid:p.offer); t.upl_usd=+p.upl; return; }
+      const q=j.prices[EPIC(t.instrument)]; if(!q) return;
+      const px=t.side==="buy"?q.bid:q.offer, risk=Math.abs(t.entry-t.stop)||1;
+      t.last_price=px; if(t.risk_usd) t.upl_usd=+(((t.side==="buy"?px-t.entry:t.entry-px)/risk)*t.risk_usd).toFixed(2);
+    });
+    const a=j.account||{};
+    $("#liveAcct").classList.remove("hidden");
+    $("#liveAcct").innerHTML=`<div class="row between"><div class="k">Capital.com demo · live</div><span class="tag"><span class="live" style="display:inline-block;margin-right:5px"></span>${new Date(j.at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"})}</span></div>
+      <div class="row between" style="margin-top:8px"><div><small class="soft">Balance</small><div style="font-weight:800;font-size:20px">${esc(a.currency||"")} ${(+a.balance||0).toLocaleString()}</div></div>
+      <div style="text-align:right"><small class="soft">Open P/L</small><div style="font-weight:800;font-size:20px" class="${(+a.pnl||0)>=0?"pos":"neg"}">${(+a.pnl||0)>=0?"+":""}${(+a.pnl||0).toFixed(2)}</div></div></div>
+      <small class="soft">${j.positions.length} open demo position${j.positions.length===1?"":"s"} · updates every 15 s while the app is open</small>`;
+    if(state.view==="home") renderHome(); if(state.view==="trades") renderTrades();
+  }catch(e){ $("#liveAcct").classList.remove("hidden"); $("#liveAcct").innerHTML=`<div class="k">Live figures</div><small class="amb">Not available yet: ${esc(String(e.message||e))}</small>`; }
+}
+
 async function load(){
   const [tr, jr, sn, ap] = await Promise.all([
     sb.from("trades").select("*").order("opened_at",{ascending:false}).limit(500),
@@ -276,7 +340,7 @@ async function load(){
   if(tr.error){ $("#updated").textContent = "error"; toast(tr.error.message); return; }
   state.trades=tr.data; state.journal=jr.data||[]; state.snap=Object.fromEntries((sn.data||[]).map(r=>[r.key,r.data]));
   state.approvals=Object.fromEntries((ap.data||[]).map(r=>[r.trade_id,r]));
-  renderPending(); renderHome(); renderTrades(); renderJournal(); renderScores(); notifyNew(tr.data);
+  renderPending(); renderHome(); renderTrades(); renderResults(); renderJournal(); renderScores(); notifyNew(tr.data); pollLive();
   $("#updated").textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
   deepLink();
 }
@@ -298,7 +362,7 @@ async function start(){
   if(!session){ $("#login").classList.remove("hidden"); return; }
   $("#login").classList.add("hidden"); $("#nav").classList.remove("hidden"); show("home");
   if("Notification" in window && Notification.permission==="default") Notification.requestPermission();
-  await load(); setInterval(load, 45000);
+  await load(); setInterval(load, 60000); setInterval(pollLive, 15000);
   sb.channel("live").on("postgres_changes",{event:"*",schema:"public",table:"trades"},()=>load()).subscribe();
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load(); });
   window.addEventListener("hashchange", deepLink);
