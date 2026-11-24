@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1720">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Trader Mind</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="config.js"></script>
+<script src="lib/supabase.js"></script>
+<script src="lib/marked.min.js"></script>
+<script src="lib/purify.min.js"></script>
+<style>
+:root{--bg:#0f1720;--card:#17212c;--line:#253241;--ink:#e8edf2;--soft:#93a1b0;--green:#3ecf8e;--red:#ef6461;--amber:#f2b84b;--blue:#5aa9e6}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(15,23,32,.96);backdrop-filter:blur(6px);padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+h1{font-size:18px;margin:0}small,.soft{color:var(--soft)}main{padding:12px 14px 90px;max-width:760px;margin:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.k{font-size:12px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em}.v{font-size:22px;font-weight:650}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0}.chip{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--soft)}
+.win{color:var(--green)}.loss{color:var(--red)}.open{color:var(--blue)}.prop{color:var(--amber)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#0b1118;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;color:var(--soft);padding:12px 0;font-size:13px}nav button.on{color:var(--ink);font-weight:600}
+input,button.main{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0b1118;color:var(--ink);font-size:16px;margin-top:8px}
+button.main{background:var(--ink);color:var(--bg);font-weight:600;border:0}
+.md h1,.md h2,.md h3{font-size:16px}.md table{border-collapse:collapse;font-size:12px;display:block;overflow-x:auto}.md td,.md th{border:1px solid var(--line);padding:4px 6px}
+.md code{background:#0b1118;padding:1px 4px;border-radius:4px}.hidden{display:none}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}.bar>i{display:block;height:100%;background:var(--green)}
+</style>
+</head>
+<body>
+<header><div class="row"><h1>Trader Mind</h1><small id="updated">…</small></div></header>
+<main>
+  <section id="login" class="hidden card">
+    <div class="k">Sign in</div>
+    <p class="soft">Enter your email. A sign-in link arrives in your inbox; open it on this phone.</p>
+    <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+    <button class="main" id="send">Send sign-in link</button>
+    <p id="loginmsg" class="soft"></p>
+  </section>
+
+  <section id="v-home" class="view hidden">
+    <div id="posture" class="card"></div>
+    <div class="grid" id="classes"></div>
+    <div id="fxstats" class="card"></div>
+    <div class="card"><div class="k">Latest journal</div><div id="lastj" class="md"></div></div>
+  </section>
+
+  <section id="v-trades" class="view hidden">
+    <div class="chips" id="cls"></div>
+    <div class="chips" id="sts"></div>
+    <div id="tlist"></div>
+  </section>
+
+  <section id="v-journal" class="view hidden"><div id="jlist"></div></section>
+
+  <section id="v-rules" class="view hidden">
+    <div class="card"><div class="k">Scoreboard</div><div id="score" class="md"></div></div>
+    <div class="card"><div class="k">Lessons</div><div id="lessons" class="md"></div></div>
+  </section>
+</main>
+<nav id="nav" class="hidden">
+  <button data-v="home" class="on">Overview</button><button data-v="trades">Trades</button>
+  <button data-v="journal">Journal</button><button data-v="rules">Scores</button>
+</nav>
+<script>
+const sb = supabase.createClient(window.TM.SUPABASE_URL, window.TM.SUPABASE_ANON_KEY);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const md = s => DOMPurify.sanitize(marked.parse(s || ""));
+const CLASSES = {all:"All", stock:"Stocks", forex:"Forex", commodity:"Commodities", crypto:"Crypto"};
+const STATUSES = {open:"Open", proposed:"Waiting for yes", closed:"Closed", cancelled:"History"};
+let state = {cls:"all", st:"open", trades:[], approvals:{}, seen: JSON.parse(localStorage.getItem("tm_seen") || "{}")};
+
+function show(v){document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+
+$("#send").onclick = async () => {
+  const email = $("#email").value.trim(); if(!email) return;
+  const {error} = await sb.auth.signInWithOtp({email, options:{emailRedirectTo: location.href.split("#")[0], shouldCreateUser:false}});
+  $("#loginmsg").textContent = error ? ("Could not send: " + error.message) : "Link sent. Check your email on this phone.";
+};
+
+function chips(el, map, key){
+  el.innerHTML = Object.entries(map).map(([k,v])=>`<button class="chip ${state[key]===k?"on":""}" data-k="${k}">${v}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{state[key]=b.dataset.k;renderTrades();});
+}
+
+function tradeCard(t){
+  const res = t.status==="closed" ? `<span class="${t.result==="win"?"win":"loss"}">${esc(t.result)} ${t.r!=null?(t.r>0?"+":"")+Number(t.r).toFixed(2)+"R":""} ${t.pnl_usd!=null?"$"+Number(t.pnl_usd).toFixed(2):""}</span>`
+            : t.status==="open" ? `<span class="open">open</span>` : t.status==="proposed" ? `<span class="prop">waiting for your yes</span>` : `<span class="soft">history</span>`;
+  return `<div class="card"><div class="row"><b>${esc(t.side.toUpperCase())} ${esc(t.instrument)}</b>${res}</div>
+    <div class="row" style="margin-top:4px"><span class="tag">${esc(CLASSES[t.asset_class])}</span><span class="tag">${esc(t.mode)}</span><span class="tag">${esc(t.setup||"")}</span><small>${t.opened_at?new Date(t.opened_at).toLocaleString():""}</small></div>
+    <div class="soft" style="margin-top:8px">Entry ${esc(t.entry)} · Stop ${esc(t.stop)} · Target ${esc(t.target)}${t.exit?` · Exit ${esc(t.exit)}`:""}</div>
+    ${t.expectation?`<div style="margin-top:6px">${esc(t.expectation)}</div>`:""}
+    ${decideBox(t)}</div>`;
+}
+
+function decideBox(t){
+  if(t.mode!=="demo"||t.status!=="proposed"||!t.expires_at) return "";
+  const d = state.approvals[t.id];
+  if(d) return `<div style="margin-top:10px" class="${d.decision==="approve"?"win":"loss"}">You chose ${esc(d.decision.toUpperCase())} at ${new Date(d.decided_at).toLocaleTimeString()}. The run will act on it.</div>`;
+  const left = Math.max(0, Math.round((new Date(t.expires_at) - Date.now())/60000));
+  if(left<=0) return `<div style="margin-top:10px" class="soft">Window closed: this ticket expires, nothing is placed.</div>`;
+  return `<div style="margin-top:10px"><div class="prop">Demo account only · ${left} min left to decide</div>
+    <div class="row" style="margin-top:8px"><button class="main" style="background:var(--green)" onclick="decide('${esc(t.id)}','approve')">Approve</button>
+    <button class="main" style="background:var(--red);color:#fff" onclick="decide('${esc(t.id)}','reject')">Reject</button></div></div>`;
+}
+
+async function decide(id, decision){
+  const t = state.trades.find(x=>x.id===id); if(!t) return;
+  if(!confirm(`${decision.toUpperCase()} ${t.side.toUpperCase()} ${t.instrument} on the DEMO account?\nEntry ${t.entry}, stop ${t.stop}, target ${t.target}`)) return;
+  const {error} = await sb.from("approvals").insert({trade_id:id, fingerprint:t.fingerprint, decision});
+  alert(error ? "Not saved: " + error.message : "Saved. The run places it after a final risk check.");
+  load();
+}
+
+function renderTrades(){
+  chips($("#cls"), CLASSES, "cls"); chips($("#sts"), STATUSES, "st");
+  const list = state.trades.filter(t=>(state.cls==="all"||t.asset_class===state.cls)&&t.status===state.st);
+  $("#tlist").innerHTML = list.length ? list.map(tradeCard).join("") : `<div class="card soft">Nothing here yet.</div>`;
+}
+
+function postureCard(r){
+  if(!r) return `<div class="k">Market posture</div><div class="soft">No regime check yet.</div>`;
+  const col = {allow:"win", reduce:"prop", cash:"loss"}[r.posture] || "soft";
+  const c = r.crypto ? `<div style="margin-top:8px">Crypto: <b>${esc(r.crypto.zone||"unchecked")}</b> ${r.crypto.score!=null?`(${r.crypto.score}/100)`:""}</div>` : "";
+  return `<div class="k">Stock market posture</div><div class="v ${col}">${esc((r.posture||"?").toUpperCase())}</div>
+    <div class="soft">Exposure ceiling ${esc(r.exposure_ceiling_pct)}% · confidence ${esc(r.confidence)}</div>
+    <div style="margin-top:6px">${esc(r.rationale||"")}</div>${c}<small>${esc(r.created_at||"")}</small>`;
+}
+
+async function load(){
+  const ap = await sb.from("approvals").select("*");
+  state.approvals = Object.fromEntries((ap.data||[]).map(r=>[r.trade_id, r]));
+  const [tr, st, jr, sn] = await Promise.all([
+    sb.from("trades").select("*").order("opened_at",{ascending:false}).limit(500),
+    sb.from("trade_stats").select("*"),
+    sb.from("journal").select("*").order("day",{ascending:false}).limit(60),
+    sb.from("snapshots").select("*")]);
+  if(tr.error){ $("#updated").textContent = "error: " + tr.error.message; return; }
+  state.trades = tr.data;
+  const snap = Object.fromEntries((sn.data||[]).map(r=>[r.key, r.data]));
+  $("#posture").innerHTML = postureCard(snap.regime);
+  const by = {}; (st.data||[]).forEach(r=>{const b=by[r.asset_class]||(by[r.asset_class]={closed:0,open:0,wins:0,pnl:0}); b.closed+=r.closed;b.open+=r.open;b.wins+=r.wins;b.pnl+=Number(r.pnl_usd||0);});
+  $("#classes").innerHTML = ["stock","forex","commodity","crypto"].map(k=>{const b=by[k]||{closed:0,open:0,wins:0,pnl:0};
+    const wr = b.closed? Math.round(100*b.wins/b.closed):null;
+    return `<div class="card"><div class="k">${CLASSES[k]}</div><div class="v ${b.pnl>0?"win":b.pnl<0?"loss":""}">${b.closed?(b.pnl>=0?"+":"")+"$"+b.pnl.toFixed(0):"—"}</div>
+      <small>${b.open} open · ${b.closed} closed${wr!=null?` · ${wr}% wins`:""}</small><div class="bar"><i style="width:${wr||0}%"></i></div></div>`;}).join("");
+  const fx = snap.forex_stats, a = fx && fx.stats && fx.stats.all;
+  $("#fxstats").innerHTML = `<div class="k">Forex study (shadow trades)</div>` + (a ? `<div>${a.trades} closed · ${Math.round(a.win_rate*100)}% wins · avg ${a.avg_r>0?"+":""}${a.avg_r}R · ${a.total_usd>=0?"+":""}$${a.total_usd}</div>` : `<div class="soft">No closed trades yet. ${fx?fx.open+" open.":""}</div>`) + `<small>Shadow = scored as if real; no order is sent.</small>`;
+  const j = jr.data||[];
+  $("#lastj").innerHTML = j[0] ? `<b>${esc(j[0].title)}</b>` + md(j[0].body_md.slice(0,1500)) : "";
+  $("#jlist").innerHTML = j.map((e,i)=>`<details class="card" ${i===0?"open":""}><summary><b>${esc(e.title)}</b></summary><div class="md">${md(e.body_md)}</div></details>`).join("");
+  $("#score").innerHTML = md(snap.scoreboard && snap.scoreboard.markdown);
+  $("#lessons").innerHTML = md(snap.lessons && snap.lessons.markdown);
+  renderTrades();
+  notifyNew(tr.data);
+  $("#updated").textContent = "updated " + new Date().toLocaleTimeString();
+}
+
+function notifyNew(rows){
+  const first = !Object.keys(state.seen).length;
+  rows.forEach(t=>{
+    if(state.seen[t.id]!==t.status && !first && t.status!=="cancelled" && "Notification" in window && Notification.permission==="granted"){
+      new Notification(`${CLASSES[t.asset_class]}: ${t.side.toUpperCase()} ${t.instrument} ${t.status}`, {body: t.status==="closed" ? `${t.result} ${t.r}R` : `Entry ${t.entry}, stop ${t.stop}, target ${t.target}`});
+    }
+    state.seen[t.id]=t.status;
+  });
+  localStorage.setItem("tm_seen", JSON.stringify(state.seen));
+}
+
+async function start(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){ $("#login").classList.remove("hidden"); $("#updated").textContent=""; return; }
+  $("#login").classList.add("hidden"); $("#nav").classList.remove("hidden"); show("home");
+  if("Notification" in window && Notification.permission==="default") Notification.requestPermission();
+  await load(); setInterval(load, 60000);
+  sb.channel("trades").on("postgres_changes",{event:"*",schema:"public",table:"trades"},load).subscribe();
+}
+sb.auth.onAuthStateChange((ev)=>{ if(ev==="SIGNED_IN" && /access_token|code=/.test(location.href)) location.replace(location.href.split("#")[0].split("?")[0]); });
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+start();
+</script>
+</body>
+</html>
