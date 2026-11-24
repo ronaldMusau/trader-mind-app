@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f1720">
+<meta name="theme-color" content="#0b1016">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Trader Mind</title>
 <link rel="manifest" href="manifest.json">
@@ -14,42 +14,88 @@
 <script src="lib/marked.min.js"></script>
 <script src="lib/purify.min.js"></script>
 <style>
-:root{--bg:#0f1720;--card:#17212c;--line:#253241;--ink:#e8edf2;--soft:#93a1b0;--green:#3ecf8e;--red:#ef6461;--amber:#f2b84b;--blue:#5aa9e6}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{position:sticky;top:0;z-index:5;background:rgba(15,23,32,.96);backdrop-filter:blur(6px);padding:14px 16px 8px;border-bottom:1px solid var(--line)}
-h1{font-size:18px;margin:0}small,.soft{color:var(--soft)}main{padding:12px 14px 90px;max-width:760px;margin:auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
-.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.k{font-size:12px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em}.v{font-size:22px;font-weight:650}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0}.chip{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap}
+:root{--bg:#0b1016;--bg2:#0f1620;--card:#141d28;--card2:#182333;--line:#223043;--ink:#eaf0f6;--soft:#8fa0b3;--dim:#5d6f84;
+--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#60a5fa;--violet:#a78bfa;--gold:#f5c451}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#17263a 0%,var(--bg) 55%) fixed;color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+header{position:sticky;top:0;z-index:20;background:rgba(11,16,22,.82);backdrop-filter:blur(10px);padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px}
+.live{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:ping 2s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(52,211,153,.55)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.grow{flex:1}.soft{color:var(--soft)}.dim{color:var(--dim)}small{font-size:12px}
+.iconbtn{background:var(--card);border:1px solid var(--line);border-radius:10px;width:34px;height:34px;display:grid;place-items:center}
+main{padding:12px 14px 100px;max-width:760px;margin:auto}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;animation:rise .45s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.k{font-size:11px;color:var(--soft);text-transform:uppercase;letter-spacing:.09em;font-weight:600}
+.big{font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
+.row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid2 .card{margin:0}
+.pos{color:var(--green)}.neg{color:var(--red)}.amb{color:var(--amber)}.blu{color:var(--blue)}
+.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em}
+.pill.buy{background:rgba(52,211,153,.15);color:var(--green)}.pill.sell{background:rgba(248,113,113,.15);color:var(--red)}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--soft);background:none}
+.ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+.ico.stock{background:rgba(96,165,250,.14)}.ico.forex{background:rgba(52,211,153,.14)}.ico.commodity{background:rgba(245,196,81,.14)}.ico.crypto{background:rgba(167,139,250,.14)}
+.pending{position:relative;border:1px solid rgba(251,191,36,.55);background:linear-gradient(135deg,rgba(251,191,36,.16),rgba(251,191,36,.04))}
+.pending:before{content:"";position:absolute;inset:-1px;border-radius:18px;border:2px solid rgba(251,191,36,.6);animation:glow 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes glow{50%{opacity:.15}}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:22px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.btn{border:0;border-radius:14px;padding:14px;font-weight:800;font-size:16px}
+.btn.ok{background:var(--green);color:#052e1f}.btn.no{background:#2a1416;color:var(--red);border:1px solid rgba(248,113,113,.4)}
+.btn:active{transform:scale(.98)}
+.range{position:relative;height:10px;border-radius:6px;background:linear-gradient(90deg,rgba(248,113,113,.35),rgba(255,255,255,.06) 45%,rgba(52,211,153,.35));margin:14px 0 6px}
+.range .mk{position:absolute;top:-5px;width:3px;height:20px;border-radius:2px;background:var(--ink);transition:left 1s cubic-bezier(.2,.8,.2,1)}
+.range .en{position:absolute;top:-3px;width:2px;height:16px;background:var(--dim)}
+.range-l{display:flex;justify-content:space-between;font-size:11px;color:var(--soft)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;background:rgba(9,13,18,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;color:var(--dim);padding:9px 0 8px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+nav button.on{color:var(--ink)}nav button.on svg{stroke:var(--green)}
+nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--amber);color:#1a1300;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;animation:bump .6s ease}
+@keyframes bump{50%{transform:scale(1.3)}}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:flex;gap:6px;align-items:center}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--soft)}
-.win{color:var(--green)}.loss{color:var(--red)}.open{color:var(--blue)}.prop{color:var(--amber)}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#0b1118;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav button{flex:1;background:none;border:0;color:var(--soft);padding:12px 0;font-size:13px}nav button.on{color:var(--ink);font-weight:600}
-input,button.main{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0b1118;color:var(--ink);font-size:16px;margin-top:8px}
-button.main{background:var(--ink);color:var(--bg);font-weight:600;border:0}
-.md h1,.md h2,.md h3{font-size:16px}.md table{border-collapse:collapse;font-size:12px;display:block;overflow-x:auto}.md td,.md th{border:1px solid var(--line);padding:4px 6px}
-.md code{background:#0b1118;padding:1px 4px;border-radius:4px}.hidden{display:none}
-.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}.bar>i{display:block;height:100%;background:var(--green)}
+.chip .n{font-size:11px;opacity:.7}
+.md{font-size:14px}.md h1,.md h2,.md h3{font-size:15px;margin:12px 0 6px}.md table{border-collapse:collapse;font-size:12px;display:block;overflow-x:auto}
+.md td,.md th{border:1px solid var(--line);padding:4px 6px}.md code{background:#0b1118;padding:1px 4px;border-radius:4px}.md ul{padding-left:18px}
+.tl{position:relative;padding-left:20px}.tl:before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl .dot{position:absolute;left:-19px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(52,211,153,.15)}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0b1118;color:var(--ink);font-size:16px;margin-top:10px}
+.hidden{display:none!important}
+.empty{text-align:center;padding:26px 10px;color:var(--soft)}
+.shimmer{background:linear-gradient(90deg,var(--card) 0%,var(--card2) 50%,var(--card) 100%);background-size:200% 100%;animation:sh 1.4s infinite;border-radius:12px;height:16px;margin:8px 0}
+@keyframes sh{to{background-position:-200% 0}}
+.flash{animation:flash 1.6s ease 2}@keyframes flash{50%{box-shadow:0 0 0 3px var(--amber)}}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:50;animation:rise .3s ease}
 </style>
 </head>
 <body>
-<header><div class="row"><h1>Trader Mind</h1><small id="updated">…</small></div></header>
+<header>
+  <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
+  <h1>Trader Mind</h1><span class="live" title="live"></span>
+  <span class="grow"></span><small id="updated" class="soft"></small>
+  <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+</header>
 <main>
   <section id="login" class="hidden card">
     <div class="k">Sign in</div>
     <p class="soft">Enter your email. A sign-in link arrives in your inbox; open it on this phone.</p>
     <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
-    <button class="main" id="send">Send sign-in link</button>
+    <button class="btn ok" style="width:100%;margin-top:10px" id="send">Send sign-in link</button>
     <p id="loginmsg" class="soft"></p>
   </section>
 
+  <div id="pendingBox"></div>
+
   <section id="v-home" class="view hidden">
-    <div id="posture" class="card"></div>
-    <div class="grid" id="classes"></div>
-    <div id="fxstats" class="card"></div>
-    <div class="card"><div class="k">Latest journal</div><div id="lastj" class="md"></div></div>
+    <div class="card" id="hero"><div class="shimmer"></div><div class="shimmer" style="width:60%"></div></div>
+    <div class="grid2" id="gauges"></div>
+    <div class="grid2" id="classes" style="margin-top:12px"></div>
+    <div id="openList"></div>
+    <div class="card" id="lastj"></div>
   </section>
 
   <section id="v-trades" class="view hidden">
@@ -58,29 +104,41 @@ button.main{background:var(--ink);color:var(--bg);font-weight:600;border:0}
     <div id="tlist"></div>
   </section>
 
-  <section id="v-journal" class="view hidden"><div id="jlist"></div></section>
+  <section id="v-journal" class="view hidden"><div id="jlist" class="tl"></div></section>
 
   <section id="v-rules" class="view hidden">
-    <div class="card"><div class="k">Scoreboard</div><div id="score" class="md"></div></div>
-    <div class="card"><div class="k">Lessons</div><div id="lessons" class="md"></div></div>
+    <div class="card"><div class="k">Process score per session</div><div id="scoreChart"></div><small class="soft">Gate: 95%+ for 10 sessions in a row before real money is even discussed.</small></div>
+    <div class="card"><div class="k">Lessons learned</div><div id="lessons" class="md"></div></div>
   </section>
 </main>
+
 <nav id="nav" class="hidden">
-  <button data-v="home" class="on">Overview</button><button data-v="trades">Trades</button>
-  <button data-v="journal">Journal</button><button data-v="rules">Scores</button>
+  <button data-v="home" class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Overview</button>
+  <button data-v="trades"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>Trades<span class="badge hidden" id="badge">0</span></button>
+  <button data-v="journal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/></svg>Journal</button>
+  <button data-v="rules"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Scores</button>
 </nav>
+
 <script>
 const sb = supabase.createClient(window.TM.SUPABASE_URL, window.TM.SUPABASE_ANON_KEY);
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const md = s => DOMPurify.sanitize(marked.parse(s || ""));
+const money = (v, sign=true) => v==null ? "—" : (sign && v>0 ? "+" : v<0 ? "−" : "") + "$" + Math.abs(+v).toFixed(2);
 const CLASSES = {all:"All", stock:"Stocks", forex:"Forex", commodity:"Commodities", crypto:"Crypto"};
-const STATUSES = {open:"Open", proposed:"Waiting for yes", closed:"Closed", cancelled:"History"};
-let state = {cls:"all", st:"open", trades:[], approvals:{}, seen: JSON.parse(localStorage.getItem("tm_seen") || "{}")};
+const STATUSES = {open:"Open", proposed:"Waiting", closed:"Closed", cancelled:"History"};
+const ICON = {
+  stock:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><path d="M6 3v4M6 15v6M18 3v6M18 17v4M12 6v3M12 17v4"/><rect x="4" y="7" width="4" height="8" rx="1"/><rect x="16" y="9" width="4" height="8" rx="1"/><rect x="10" y="9" width="4" height="8" rx="1"/></svg>`,
+  forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
+  commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
+  crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
+let state = {cls:"all", st:"open", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
-function show(v){document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
-  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));}
+function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
+function show(v){state.view=v;document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+$("#refresh").onclick=()=>{load();toast("Refreshed");};
 
 $("#send").onclick = async () => {
   const email = $("#email").value.trim(); if(!email) return;
@@ -88,102 +146,162 @@ $("#send").onclick = async () => {
   $("#loginmsg").textContent = error ? ("Could not send: " + error.message) : "Link sent. Check your email on this phone.";
 };
 
-function chips(el, map, key){
-  el.innerHTML = Object.entries(map).map(([k,v])=>`<button class="chip ${state[key]===k?"on":""}" data-k="${k}">${v}</button>`).join("");
-  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{state[key]=b.dataset.k;renderTrades();});
+function pendings(){ return state.trades.filter(t=>t.mode==="demo"&&t.status==="proposed"&&t.expires_at&&new Date(t.expires_at)>Date.now()&&!state.approvals[t.id]); }
+function mmss(ms){ms=Math.max(0,ms);const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);return m+":"+String(s).padStart(2,"0");}
+function renderPending(){
+  const p = pendings();
+  $("#badge").textContent = p.length; $("#badge").classList.toggle("hidden", !p.length);
+  document.title = (p.length?`(${p.length}) `:"")+"Trader Mind";
+  try{ p.length ? navigator.setAppBadge?.(p.length) : navigator.clearAppBadge?.(); }catch(e){}
+  $("#pendingBox").innerHTML = p.map(t=>`<div class="card pending" id="pend-${esc(t.id)}">
+    <div class="row between"><div class="k amb">Waiting for your yes · demo</div><div class="timer amb" data-exp="${esc(t.expires_at)}">${mmss(new Date(t.expires_at)-Date.now())}</div></div>
+    <div class="row" style="margin-top:10px"><div class="ico ${t.asset_class}">${ICON[t.asset_class]}</div>
+      <div class="grow"><div style="font-weight:800;font-size:18px">${esc(t.instrument.replace("_","/"))} <span class="pill ${t.side}">${t.side.toUpperCase()}</span></div>
+      <small class="soft">Entry ${esc(t.entry)} · Stop ${esc(t.stop)} · Target ${esc(t.target)}</small></div></div>
+    <div class="row between" style="margin-top:10px"><span class="soft">Risk if stopped</span><b class="neg">${money(-Math.abs(t.risk_usd||0))}</b></div>
+    <div class="row between"><span class="soft">If target hit</span><b class="pos">${t.risk_usd? money(Math.abs(t.risk_usd)*((Math.abs(t.target-t.entry)/Math.abs(t.entry-t.stop))||0)) : "—"}</b></div>
+    <div class="btns"><button class="btn no" onclick="decide('${esc(t.id)}','reject')">Reject</button><button class="btn ok" onclick="decide('${esc(t.id)}','approve')">Approve</button></div>
+  </div>`).join("");
 }
-
-function tradeCard(t){
-  const res = t.status==="closed" ? `<span class="${t.result==="win"?"win":"loss"}">${esc(t.result)} ${t.r!=null?(t.r>0?"+":"")+Number(t.r).toFixed(2)+"R":""} ${t.pnl_usd!=null?"$"+Number(t.pnl_usd).toFixed(2):""}</span>`
-            : t.status==="open" ? `<span class="open">open</span>` : t.status==="proposed" ? `<span class="prop">waiting for your yes</span>` : `<span class="soft">history</span>`;
-  return `<div class="card"><div class="row"><b>${esc(t.side.toUpperCase())} ${esc(t.instrument)}</b>${res}</div>
-    <div class="row" style="margin-top:4px"><span class="tag">${esc(CLASSES[t.asset_class])}</span><span class="tag">${esc(t.mode)}</span><span class="tag">${esc(t.setup||"")}</span><small>${t.opened_at?new Date(t.opened_at).toLocaleString():""}</small></div>
-    <div class="soft" style="margin-top:8px">Entry ${esc(t.entry)} · Stop ${esc(t.stop)} · Target ${esc(t.target)}${t.exit?` · Exit ${esc(t.exit)}`:""}</div>
-    ${t.expectation?`<div style="margin-top:6px">${esc(t.expectation)}</div>`:""}
-    ${decideBox(t)}</div>`;
-}
-
-function decideBox(t){
-  if(t.mode!=="demo"||t.status!=="proposed"||!t.expires_at) return "";
-  const d = state.approvals[t.id];
-  if(d) return `<div style="margin-top:10px" class="${d.decision==="approve"?"win":"loss"}">You chose ${esc(d.decision.toUpperCase())} at ${new Date(d.decided_at).toLocaleTimeString()}. The run will act on it.</div>`;
-  const left = Math.max(0, Math.round((new Date(t.expires_at) - Date.now())/60000));
-  if(left<=0) return `<div style="margin-top:10px" class="soft">Window closed: this ticket expires, nothing is placed.</div>`;
-  return `<div style="margin-top:10px"><div class="prop">Demo account only · ${left} min left to decide</div>
-    <div class="row" style="margin-top:8px"><button class="main" style="background:var(--green)" onclick="decide('${esc(t.id)}','approve')">Approve</button>
-    <button class="main" style="background:var(--red);color:#fff" onclick="decide('${esc(t.id)}','reject')">Reject</button></div></div>`;
-}
+setInterval(()=>{document.querySelectorAll(".timer[data-exp]").forEach(el=>{const ms=new Date(el.dataset.exp)-Date.now();el.textContent=mmss(ms);if(ms<=0)renderPending();});},1000);
 
 async function decide(id, decision){
   const t = state.trades.find(x=>x.id===id); if(!t) return;
-  if(!confirm(`${decision.toUpperCase()} ${t.side.toUpperCase()} ${t.instrument} on the DEMO account?\nEntry ${t.entry}, stop ${t.stop}, target ${t.target}`)) return;
   const {error} = await sb.from("approvals").insert({trade_id:id, fingerprint:t.fingerprint, decision});
-  alert(error ? "Not saved: " + error.message : "Saved. The run places it after a final risk check.");
-  load();
+  if(error){ toast("Not saved: "+error.message); return; }
+  state.approvals[id]={decision,decided_at:new Date().toISOString()};
+  renderPending(); toast(decision==="approve"?"Approved ✓ placing on demo after a risk check":"Rejected: nothing will be placed");
+  if(navigator.vibrate) navigator.vibrate(40);
 }
 
+function areaChart(points){
+  const W=320,H=90; if(points.length<2) points=[0,...points,points.at(-1)||0];
+  const min=Math.min(0,...points),max=Math.max(0,...points),span=(max-min)||1;
+  const xy=points.map((v,i)=>[i*(W/(points.length-1)), H-6-(v-min)/span*(H-12)]);
+  const d="M"+xy.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" L");
+  const up=points.at(-1)>=0, col=up?"#34d399":"#f87171", zero=H-6-(0-min)/span*(H-12);
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none">
+   <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+   <line x1="0" x2="${W}" y1="${zero}" y2="${zero}" stroke="#223043" stroke-dasharray="3 4"/>
+   <path d="${d} L${W},${H} L0,${H} Z" fill="url(#ag)"/>
+   <path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"><animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.2s" fill="freeze"/></path>
+   <circle cx="${xy.at(-1)[0]}" cy="${xy.at(-1)[1]}" r="4" fill="${col}"><animate attributeName="r" values="4;7;4" dur="2s" repeatCount="indefinite"/></circle></svg>`;
+}
+function gauge(value, label, sub, col, id){
+  const v=Math.max(0,Math.min(100,value??0)), cx=60, cy=60, r=46;
+  return `<div class="card"><div class="k">${label}</div>
+   <svg viewBox="0 0 120 72" width="100%" height="90"><defs><linearGradient id="gg${id}" x1="0" x2="1"><stop offset="0" stop-color="#f87171"/><stop offset=".5" stop-color="#fbbf24"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs>
+    <path d="M14 60 A46 46 0 0 1 106 60" fill="none" stroke="#223043" stroke-width="10" stroke-linecap="round"/>
+    <path d="M14 60 A46 46 0 0 1 106 60" fill="none" stroke="url(#gg${id})" stroke-width="10" stroke-linecap="round" opacity=".9"/>
+    <line class="needle" x1="${cx}" y1="${cy}" x2="${cx-r+6}" y2="${cy}" stroke="#eaf0f6" stroke-width="3" stroke-linecap="round" data-deg="${v*1.8}" style="transform-origin:60px 60px;transform:rotate(0deg);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)"/>
+    <circle cx="${cx}" cy="${cy}" r="5" fill="#eaf0f6"/></svg>
+   <div style="font-weight:800;font-size:18px;margin-top:-6px" class="${col}">${esc(sub)}</div><small class="soft">${value==null?"not checked yet":Math.round(v)+" / 100"}</small></div>`;
+}
+function ring(pct,col){const c=2*Math.PI*16,o=c*(1-(pct||0)/100);return `<svg width="44" height="44" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="#223043" stroke-width="5"/><circle cx="20" cy="20" r="16" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}" transform="rotate(-90 20 20)"><animate attributeName="stroke-dashoffset" from="${c}" to="${o}" dur="1.2s" fill="freeze"/></circle><text x="20" y="24" text-anchor="middle" font-size="10" fill="#eaf0f6" font-weight="700">${pct==null?"–":pct+"%"}</text></svg>`;}
+function countUp(el,to){const t0=performance.now(),d=900;(function f(t){const k=Math.min(1,(t-t0)/d),v=to*(1-Math.pow(1-k,3));el.textContent=money(v);if(k<1)requestAnimationFrame(f);})(t0);}
+
+function rangeBar(t){
+  if(t.stop==null||t.target==null) return "";
+  const lo=Math.min(t.stop,t.target), hi=Math.max(t.stop,t.target); if(!(hi>lo)) return "";
+  const pos=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));
+  const now=t.last_price??t.exit??t.entry; const flip=t.side==="sell";
+  const L=v=>flip?100-pos(v):pos(v);
+  return `<div class="range"><div class="en" style="left:${L(t.entry)}%"></div><div class="mk" style="left:calc(${L(now)}% - 1px)"></div></div>
+   <div class="range-l"><span>stop ${esc(t.stop)}</span><span>${t.last_price?"now "+esc(t.last_price):t.exit?"exit "+esc(t.exit):"entry "+esc(t.entry)}</span><span>target ${esc(t.target)}</span></div>`;
+}
+function tradeCard(t){
+  const right = t.status==="closed" ? `<b class="${t.result==="win"?"pos":"neg"}">${money(t.pnl_usd)}</b>`
+    : t.status==="open" ? (t.upl_usd!=null?`<b class="${t.upl_usd>=0?"pos":"neg"}">${money(t.upl_usd)}</b>`:`<span class="blu">open</span>`)
+    : t.status==="proposed" ? `<span class="amb">waiting</span>` : `<span class="dim">history</span>`;
+  return `<div class="card" id="t-${esc(t.id)}"><div class="row"><div class="ico ${t.asset_class}">${ICON[t.asset_class]}</div>
+    <div class="grow"><div style="font-weight:700">${esc(t.instrument.replace("_","/"))} <span class="pill ${t.side}">${t.side.toUpperCase()}</span></div>
+    <small class="soft">${esc(t.mode==="shadow"?"study (no order)":t.mode==="demo"?"demo account":t.mode)}${t.setup?" · "+esc(t.setup):""}${t.r!=null?" · "+(t.r>0?"+":"")+(+t.r).toFixed(2)+"R":""}</small></div>${right}</div>
+    ${t.status!=="cancelled"?rangeBar(t):""}
+    ${t.expectation?`<div class="soft" style="margin-top:8px;font-size:13px">${esc(t.expectation)}</div>`:""}
+    <small class="dim">${t.opened_at?new Date(t.opened_at).toLocaleString():""}</small></div>`;
+}
+
+function renderHome(){
+  const closed=state.trades.filter(t=>t.status==="closed").sort((a,b)=>new Date(a.closed_at)-new Date(b.closed_at));
+  let cum=0; const curve=closed.map(t=>cum+=+(t.pnl_usd||0));
+  const open=state.trades.filter(t=>t.status==="open"), upl=open.reduce((s,t)=>s+(+t.upl_usd||0),0);
+  const wins=closed.filter(t=>t.result==="win").length;
+  $("#hero").innerHTML=`<div class="row between"><div class="k">Total result (closed trades)</div><span class="tag">${closed.length} closed · ${open.length} open</span></div>
+    <div class="big ${cum>=0?"pos":"neg"}" id="pl">$0.00</div>
+    <small class="soft">${closed.length?`${wins} wins · ${closed.length-wins} losses`:"No closed trades yet: the first results land here."}${open.length?` · open now ${money(upl)}`:""}</small>
+    <div style="margin-top:10px">${areaChart(curve.length?curve:[0,0])}</div>`;
+  countUp($("#pl"),cum);
+  const r=state.snap.regime||{}, c=r.crypto||{};
+  const post={allow:["ALLOW new trades","pos"],reduce:["REDUCE size","amb"],cash:["CASH only","neg"]}[r.posture]||["not checked","dim"];
+  $("#gauges").innerHTML = gauge(r.component_scores?.uptrend_score ?? null, "Stock market", post[0], post[1], "s")
+                         + gauge(c.score ?? null, "Crypto market", (c.zone||"not checked").replace("_"," "), c.score>=60?"pos":c.score>=40?"amb":"neg", "c");
+  requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll(".needle").forEach(n=>n.style.transform=`rotate(${n.dataset.deg}deg)`),50));
+  const by={}; state.trades.forEach(t=>{const b=by[t.asset_class]||(by[t.asset_class]={c:0,o:0,w:0,p:0});if(t.status==="closed"){b.c++;b.p+=+(t.pnl_usd||0);if(t.result==="win")b.w++;}if(t.status==="open")b.o++;});
+  const COL={stock:"#60a5fa",forex:"#34d399",commodity:"#f5c451",crypto:"#a78bfa"};
+  $("#classes").innerHTML=["forex","commodity","stock","crypto"].map(k=>{const b=by[k]||{c:0,o:0,w:0,p:0};const wr=b.c?Math.round(100*b.w/b.c):null;
+    return `<div class="card" onclick="state.cls='${k}';state.st='open';show('trades');renderTrades()" style="cursor:pointer"><div class="row between"><div class="ico ${k}">${ICON[k]}</div>${ring(wr,COL[k])}</div>
+      <div style="margin-top:8px;font-weight:700">${CLASSES[k]}</div><div class="${b.p>0?"pos":b.p<0?"neg":"soft"}" style="font-weight:800">${b.c?money(b.p):"—"}</div><small class="soft">${b.o} open · ${b.c} closed</small></div>`;}).join("");
+  $("#openList").innerHTML = open.length ? `<div class="k" style="margin:18px 4px 0">Open now</div>`+open.map(tradeCard).join("") : "";
+  const j=state.journal[0];
+  $("#lastj").innerHTML = j ? `<div class="row between"><div class="k">Latest from the journal</div><button class="tag" onclick="show('journal')">Read all</button></div><h3 style="margin:8px 0 4px;font-size:16px">${esc(j.title)}</h3><div class="md">${md(j.body_md.slice(0,900))}${j.body_md.length>900?"…":""}</div>` : `<div class="empty">The journal appears here after the first run.</div>`;
+}
+function chips(el, map, key, counts){
+  el.innerHTML = Object.entries(map).map(([k,v])=>`<button class="chip ${state[key]===k?"on":""}" data-k="${k}">${key==="cls"&&k!=="all"?ICON[k].replace(/width="22" height="22"/,'width="14" height="14"'):""}${v}${counts&&counts[k]!=null?` <span class="n">${counts[k]}</span>`:""}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{state[key]=b.dataset.k;renderTrades();});
+}
 function renderTrades(){
-  chips($("#cls"), CLASSES, "cls"); chips($("#sts"), STATUSES, "st");
-  const list = state.trades.filter(t=>(state.cls==="all"||t.asset_class===state.cls)&&t.status===state.st);
-  $("#tlist").innerHTML = list.length ? list.map(tradeCard).join("") : `<div class="card soft">Nothing here yet.</div>`;
+  const inCls=t=>state.cls==="all"||t.asset_class===state.cls;
+  const cnt={}; Object.keys(STATUSES).forEach(s=>cnt[s]=state.trades.filter(t=>inCls(t)&&t.status===s).length);
+  chips($("#cls"), CLASSES, "cls"); chips($("#sts"), STATUSES, "st", cnt);
+  const list = state.trades.filter(t=>inCls(t)&&t.status===state.st);
+  $("#tlist").innerHTML = list.length ? list.map(tradeCard).join("") : `<div class="card empty">Nothing ${STATUSES[state.st].toLowerCase()} here yet.</div>`;
 }
-
-function postureCard(r){
-  if(!r) return `<div class="k">Market posture</div><div class="soft">No regime check yet.</div>`;
-  const col = {allow:"win", reduce:"prop", cash:"loss"}[r.posture] || "soft";
-  const c = r.crypto ? `<div style="margin-top:8px">Crypto: <b>${esc(r.crypto.zone||"unchecked")}</b> ${r.crypto.score!=null?`(${r.crypto.score}/100)`:""}</div>` : "";
-  return `<div class="k">Stock market posture</div><div class="v ${col}">${esc((r.posture||"?").toUpperCase())}</div>
-    <div class="soft">Exposure ceiling ${esc(r.exposure_ceiling_pct)}% · confidence ${esc(r.confidence)}</div>
-    <div style="margin-top:6px">${esc(r.rationale||"")}</div>${c}<small>${esc(r.created_at||"")}</small>`;
+function renderJournal(){
+  $("#jlist").innerHTML = state.journal.map((e,i)=>`<div style="position:relative"><span class="dot"></span><details class="card" ${i===0?"open":""}><summary style="cursor:pointer;list-style:none"><small class="soft">${esc(e.day)}</small><div style="font-weight:700">${esc(e.title.replace(/^\d{4}-\d{2}-\d{2}\s*/,"").replace(/^[:(—-]\s*/,"")||e.title)}</div></summary><div class="md">${md(e.body_md)}</div></details></div>`).join("") || `<div class="card empty">No journal yet.</div>`;
+}
+function renderScores(){
+  const sm=(state.snap.scoreboard||{}).markdown||"";
+  const rows=[...sm.matchAll(/^\|\s*([^|]+?)\s*\|.*?\*\*([\d.]+)\s*%\*\*/gm)].map(m=>({d:m[1].replace(/\*/g,"").slice(0,22),v:+m[2]}));
+  $("#scoreChart").innerHTML = rows.length ? rows.map(r=>`<div style="margin:10px 0"><div class="row between"><small class="soft">${esc(r.d)}</small><b class="${r.v>=95?"pos":r.v>=80?"amb":"neg"}">${r.v}%</b></div>
+     <div style="height:8px;background:#223043;border-radius:5px;overflow:hidden"><div style="height:100%;width:0;background:${r.v>=95?"var(--green)":r.v>=80?"var(--amber)":"var(--red)"};border-radius:5px;transition:width 1.2s ease" data-w="${r.v}"></div></div></div>`).join("") : `<div class="empty">No sessions scored yet.</div>`;
+  setTimeout(()=>document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),60);
+  $("#lessons").innerHTML = md((state.snap.lessons||{}).markdown);
 }
 
 async function load(){
-  const ap = await sb.from("approvals").select("*");
-  state.approvals = Object.fromEntries((ap.data||[]).map(r=>[r.trade_id, r]));
-  const [tr, st, jr, sn] = await Promise.all([
+  const [tr, jr, sn, ap] = await Promise.all([
     sb.from("trades").select("*").order("opened_at",{ascending:false}).limit(500),
-    sb.from("trade_stats").select("*"),
     sb.from("journal").select("*").order("day",{ascending:false}).limit(60),
-    sb.from("snapshots").select("*")]);
-  if(tr.error){ $("#updated").textContent = "error: " + tr.error.message; return; }
-  state.trades = tr.data;
-  const snap = Object.fromEntries((sn.data||[]).map(r=>[r.key, r.data]));
-  $("#posture").innerHTML = postureCard(snap.regime);
-  const by = {}; (st.data||[]).forEach(r=>{const b=by[r.asset_class]||(by[r.asset_class]={closed:0,open:0,wins:0,pnl:0}); b.closed+=r.closed;b.open+=r.open;b.wins+=r.wins;b.pnl+=Number(r.pnl_usd||0);});
-  $("#classes").innerHTML = ["stock","forex","commodity","crypto"].map(k=>{const b=by[k]||{closed:0,open:0,wins:0,pnl:0};
-    const wr = b.closed? Math.round(100*b.wins/b.closed):null;
-    return `<div class="card"><div class="k">${CLASSES[k]}</div><div class="v ${b.pnl>0?"win":b.pnl<0?"loss":""}">${b.closed?(b.pnl>=0?"+":"")+"$"+b.pnl.toFixed(0):"—"}</div>
-      <small>${b.open} open · ${b.closed} closed${wr!=null?` · ${wr}% wins`:""}</small><div class="bar"><i style="width:${wr||0}%"></i></div></div>`;}).join("");
-  const fx = snap.forex_stats, a = fx && fx.stats && fx.stats.all;
-  $("#fxstats").innerHTML = `<div class="k">Forex study (shadow trades)</div>` + (a ? `<div>${a.trades} closed · ${Math.round(a.win_rate*100)}% wins · avg ${a.avg_r>0?"+":""}${a.avg_r}R · ${a.total_usd>=0?"+":""}$${a.total_usd}</div>` : `<div class="soft">No closed trades yet. ${fx?fx.open+" open.":""}</div>`) + `<small>Shadow = scored as if real; no order is sent.</small>`;
-  const j = jr.data||[];
-  $("#lastj").innerHTML = j[0] ? `<b>${esc(j[0].title)}</b>` + md(j[0].body_md.slice(0,1500)) : "";
-  $("#jlist").innerHTML = j.map((e,i)=>`<details class="card" ${i===0?"open":""}><summary><b>${esc(e.title)}</b></summary><div class="md">${md(e.body_md)}</div></details>`).join("");
-  $("#score").innerHTML = md(snap.scoreboard && snap.scoreboard.markdown);
-  $("#lessons").innerHTML = md(snap.lessons && snap.lessons.markdown);
-  renderTrades();
-  notifyNew(tr.data);
-  $("#updated").textContent = "updated " + new Date().toLocaleTimeString();
+    sb.from("snapshots").select("*"), sb.from("approvals").select("*")]);
+  if(tr.error){ $("#updated").textContent = "error"; toast(tr.error.message); return; }
+  state.trades=tr.data; state.journal=jr.data||[]; state.snap=Object.fromEntries((sn.data||[]).map(r=>[r.key,r.data]));
+  state.approvals=Object.fromEntries((ap.data||[]).map(r=>[r.trade_id,r]));
+  renderPending(); renderHome(); renderTrades(); renderJournal(); renderScores(); notifyNew(tr.data);
+  $("#updated").textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  deepLink();
 }
-
+function deepLink(){
+  const m=location.hash.match(/t=([^&]+)/); if(!m) return; const id=decodeURIComponent(m[1]); history.replaceState(null,"",location.pathname);
+  const p=document.getElementById("pend-"+id); if(p){window.scrollTo({top:0});p.classList.add("flash");return;}
+  const t=state.trades.find(x=>x.id===id); if(!t) return; state.cls="all"; state.st=t.status; show("trades"); renderTrades();
+  setTimeout(()=>{const el=document.getElementById("t-"+id); if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash");}},200);
+}
 function notifyNew(rows){
-  const first = !Object.keys(state.seen).length;
-  rows.forEach(t=>{
-    if(state.seen[t.id]!==t.status && !first && t.status!=="cancelled" && "Notification" in window && Notification.permission==="granted"){
-      new Notification(`${CLASSES[t.asset_class]}: ${t.side.toUpperCase()} ${t.instrument} ${t.status}`, {body: t.status==="closed" ? `${t.result} ${t.r}R` : `Entry ${t.entry}, stop ${t.stop}, target ${t.target}`});
-    }
-    state.seen[t.id]=t.status;
-  });
+  const first=!Object.keys(state.seen).length;
+  rows.forEach(t=>{ if(state.seen[t.id]!==t.status && !first && t.status!=="cancelled" && "Notification" in window && Notification.permission==="granted"){
+      new Notification(`${CLASSES[t.asset_class]}: ${t.side.toUpperCase()} ${t.instrument} ${t.status}`, {body: t.status==="closed" ? `${t.result} ${money(t.pnl_usd)}` : `Entry ${t.entry} · stop ${t.stop} · target ${t.target}`, icon:"icon-192.png"});}
+    state.seen[t.id]=t.status; });
   localStorage.setItem("tm_seen", JSON.stringify(state.seen));
 }
-
 async function start(){
   const {data:{session}} = await sb.auth.getSession();
-  if(!session){ $("#login").classList.remove("hidden"); $("#updated").textContent=""; return; }
+  if(!session){ $("#login").classList.remove("hidden"); return; }
   $("#login").classList.add("hidden"); $("#nav").classList.remove("hidden"); show("home");
   if("Notification" in window && Notification.permission==="default") Notification.requestPermission();
-  await load(); setInterval(load, 60000);
-  sb.channel("trades").on("postgres_changes",{event:"*",schema:"public",table:"trades"},load).subscribe();
+  await load(); setInterval(load, 45000);
+  sb.channel("live").on("postgres_changes",{event:"*",schema:"public",table:"trades"},()=>load()).subscribe();
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load(); });
+  window.addEventListener("hashchange", deepLink);
 }
 sb.auth.onAuthStateChange((ev)=>{ if(ev==="SIGNED_IN" && /access_token|code=/.test(location.href)) location.replace(location.href.split("#")[0].split("?")[0]); });
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
