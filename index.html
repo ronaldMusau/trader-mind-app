@@ -91,7 +91,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v5</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v6</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
 <main>
@@ -117,7 +117,8 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 
   <section id="v-ideas" class="view hidden">
     <div class="card"><div class="k">Trade ideas · Capital.com demo</div>
-      <small class="soft">The scanner checks 11 markets. Win chance comes from replaying the same rule on 2 years of each market's history plus our own study trades; the blue band is the likely range. The yellow line is the break-even win rate. Set your stake, then place the ones you like.</small></div>
+      <small class="soft">The scanner checks forex, gold, silver, oil, Bitcoin, Ethereum and big US stocks. Win chance comes from replaying the same rule on 2 years of each market's history plus our own study trades; the blue band is the likely range. The yellow line is the break-even win rate. Set your stake, then place the ones you like.</small></div>
+    <div class="chips" id="icls"></div>
     <div id="ideaList"></div>
     <div id="ideaOthers"></div>
   </section>
@@ -167,7 +168,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v5";
+const VERSION="v6";
 let state = {ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -356,9 +357,9 @@ function renderResults(){
 state.stakes = {};
 function sizeFor(t, stake){
   const dist=Math.abs(t.entry-t.stop), conv=+t.usd_per_unit_move||0; if(!dist||!conv) return {units:0,risk:0};
-  const metal=/^XA[UG]/.test(t.instrument), step=metal?0.01:100;
+  const step=+t.size_step||(/^XA[UG]/.test(t.instrument)?0.01:100);
   const units=Math.floor(stake/(dist*conv)/step+1e-9)*step;
-  return {units:+units.toFixed(2), risk:+(units*dist*conv).toFixed(2)};
+  return {units:+units.toFixed(6), risk:+(units*dist*conv).toFixed(2)};
 }
 function ideaCard(t){
   const min=Math.max(0.01,+t.stake_min||0), max=+t.stake_max||4;
@@ -367,7 +368,7 @@ function ideaCard(t){
   return `<div class="card" id="idea-${esc(t.id)}">
    <div class="row between"><div class="row"><div class="ico ${t.asset_class}">${ICON[t.asset_class]}</div>
      <div><div style="font-weight:800;font-size:18px">${esc(t.instrument.replace("_","/"))} <span class="pill ${t.side}">${t.side==="buy"?"BUY · long":"SELL · short"}</span></div>
-     <small class="soft">${esc(t.kind||"trend")} setup · entry ${esc(t.entry)} · stop ${esc(t.stop)} · target ${esc(t.target)}</small></div></div>
+     <small class="soft">${esc(CLASSES[t.asset_class]||"")} · ${esc(t.kind||"trend")} setup · entry ${esc(t.entry)} · stop ${esc(t.stop)} · target ${esc(t.target)}</small></div></div>
      <div class="timer amb" data-exp="${esc(t.expires_at)}" style="font-size:16px">${mmss(new Date(t.expires_at)-Date.now())}</div></div>
    <div class="row between" style="margin-top:12px"><div><div class="k">Win chance</div><div style="font-size:30px;font-weight:800" class="${p>be?"pos":"amb"}">${Math.round(p*100)}%</div></div>
      <div style="text-align:right"><div class="k">Likely range</div><div style="font-weight:700">${Math.round(lo*100)}–${Math.round(hi*100)}%</div><small class="soft">from ${t.samples||0} past trades</small></div></div>
@@ -392,7 +393,8 @@ function paintIdea(id){
   const z=sizeFor(t,st), rr=+t.reward_risk||1.5;
   el.querySelector(".win").textContent="+$"+(z.risk*rr).toFixed(2);
   el.querySelector(".loss").textContent="−$"+z.risk.toFixed(2);
-  el.querySelector(".sz").textContent=`Size ${z.units} ${/^XA/.test(t.instrument)?"oz":"units"} (the broker rounds down to its step, so the real max loss is $${z.risk.toFixed(2)}).`;
+  const unit={commodity:/^XA/.test(t.instrument)?"oz":"units",crypto:t.instrument.split("_")[0],stock:"shares"}[t.asset_class]||"units";
+  el.querySelector(".sz").textContent=`Size ${z.units} ${unit} (the broker rounds down to its step, so the real max loss is $${z.risk.toFixed(2)}). Stop and target are set from the demo's live price when placed.`;
   el.querySelector(".go").textContent=`Place · $${st.toFixed(2)}`;
   el.querySelector('input[type=range]').value=st;
 }
@@ -405,8 +407,11 @@ function nudge(id,d){ const t=state.trades.find(x=>x.id===id); const cur=state.s
 function placeIdea(id){ const t=state.trades.find(x=>x.id===id); const min=Math.max(0.01,+t.stake_min||0), max=+t.stake_max||4;
   const st=state.stakes[id] ?? +t.stake_default; if(!(st>=min-0.001&&st<=max+0.001)){toast(`Stake must be $${min.toFixed(2)}–$${max.toFixed(2)}`);return;}
   decide(id,"approve",st); }
+state.icls="all";
 function renderIdeas(){
-  const ids=ideasOpen();
+  const allIds=ideasOpen();
+  chips($("#icls"), CLASSES, "icls"); $("#icls").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.icls=b.dataset.k;renderIdeas();});
+  const ids=allIds.filter(t=>state.icls==="all"||t.asset_class===state.icls);
   const focused=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#ideaList");
   if(!focused){
     $("#ideaList").innerHTML = ids.length ? ids.map(ideaCard).join("") : `<div class="card empty">No ideas waiting right now. The scanner runs during forex hours and alerts your phone when it finds some.</div>`;
@@ -414,7 +419,7 @@ function renderIdeas(){
   }
   const r=state.snap.recs; if(!r||!r.ideas){ $("#ideaOthers").innerHTML=""; return; }
   const live=new Set(ids.map(t=>t.instrument));
-  const rest=r.ideas.filter(x=>!live.has(x.pair));
+  const rest=r.ideas.filter(x=>!live.has(x.pair)&&(state.icls==="all"||(x.asset_class||"forex")===state.icls));
   $("#ideaOthers").innerHTML = rest.length ? `<div class="card"><div class="row between"><div class="k">Everything the scanner checked</div><small class="soft">${new Date(r.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</small></div>
     ${rest.map(x=>`<div class="row between" style="margin:10px 0;gap:8px"><div><b>${esc(x.pair.replace("_","/"))}</b> <span class="pill ${x.side}">${x.side.toUpperCase()}</span> <small class="soft">${esc(x.kind)}</small><div><small class="dim">${esc(x.skip||"not offered this run")}</small></div></div>
       <div style="text-align:right;flex:none"><b class="${x.exp_r>0?"pos":"neg"}">${Math.round(100*x.win_prob)}%</b><div><small class="soft">${Math.round(100*x.win_lo)}–${Math.round(100*x.win_hi)}%</small></div></div></div>`).join("")}
@@ -422,7 +427,8 @@ function renderIdeas(){
 }
 
 /* ---------- live figures (Capital.com demo, read-only), every 5 s ---------- */
-const EPIC=i=>({XAU_USD:"GOLD",XAG_USD:"SILVER"}[i]||i.replace("_",""));
+const EPIC_MAP={XAU_USD:"GOLD",XAG_USD:"SILVER",WTI_USD:"OIL_CRUDE"};
+const EPIC=(i,t)=>(t&&t.epic)||EPIC_MAP[i]||i.replace("_","");
 function tickEl(el, html, dir){ if(!el) return; if(el.innerHTML!==html){ el.innerHTML=html; if(dir){ el.classList.remove("tick-up","tick-dn"); void el.offsetWidth; el.classList.add(dir>0?"tick-up":"tick-dn"); } } }
 function patchOpen(t, prev){
   document.querySelectorAll(`[id="t-${CSS.escape(t.id)}"]`).forEach(card=>{
@@ -462,7 +468,7 @@ async function pollLive(){
   if(document.hidden||liveBusy) return;
   const {data:{session}}=await sb.auth.getSession(); if(!session) return;
   const open=state.trades.filter(t=>t.status==="open");
-  const epics=[...new Set(open.map(t=>EPIC(t.instrument)))].join(",");
+  const epics=[...new Set(open.map(t=>EPIC(t.instrument,t)))].join(",");
   liveBusy=true;
   try{
     const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),9000);
@@ -476,7 +482,7 @@ async function pollLive(){
       const prev=t.last_price;
       const p=t.deal_id&&byDeal[t.deal_id];
       if(p){ t.last_price=(p.direction==="BUY"?p.bid:p.offer); t.ccy=ccy; t.upl_ccy=+p.upl; t.upl_usd=rate?+(p.upl/rate).toFixed(2):null; }
-      else { const q=j.prices[EPIC(t.instrument)]; if(!q) return;
+      else { const q=j.prices[EPIC(t.instrument,t)]; if(!q) return;
         const px=t.side==="buy"?q.bid:q.offer, risk=Math.abs(t.entry-t.stop)||1;
         t.last_price=px; if(t.risk_usd) t.upl_usd=+(((t.side==="buy"?px-t.entry:t.entry-px)/risk)*t.risk_usd).toFixed(2); }
       const a=state.ticks[t.id]||(state.ticks[t.id]=[]); if(a.at(-1)!==t.last_price){ a.push(t.last_price); if(a.length>90) a.shift(); }
