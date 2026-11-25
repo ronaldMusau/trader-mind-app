@@ -57,6 +57,7 @@ nav button{flex:1;background:none;border:0;color:var(--dim);padding:9px 0 8px;fo
 nav button.on{color:var(--ink)}nav button.on svg{stroke:var(--green)}
 nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--amber);color:#1a1300;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;animation:bump .6s ease}
 @keyframes bump{50%{transform:scale(1.3)}}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px}.pager .chip[disabled]{opacity:.35}.nt{text-align:right;font-size:12px;line-height:1.2}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:flex;gap:6px;align-items:center}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -100,7 +101,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v9</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v10</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -191,14 +192,24 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const md = s => DOMPurify.sanitize(marked.parse(s || ""));
 const money = (v, sign=true) => v==null ? "—" : (sign && v>0 ? "+" : v<0 ? "−" : "") + "$" + Math.abs(+v).toFixed(2);
 const CLASSES = {all:"All", stock:"Stocks", forex:"Forex", commodity:"Commodities", crypto:"Crypto"};
-const STATUSES = {all:"All", open:"Open", proposed:"Waiting", closed:"Closed", cancelled:"History"};
+const STATUSES = {all:"All", open:"Open", proposed:"Waiting", closed:"Closed", nottaken:"Not taken"};
+const OUTCOMES = {all:"All", win:"Wins", loss:"Losses"};
+const NOT_TAKEN = {cancelled:"Cancelled", failed:"Failed to place", rejected_by_broker:"Rejected by broker", expired:"Expired unanswered", rejected:"You skipped it"};
+const PER = 10;
+function bucket(t){ if(t.status==="open"||t.status==="closed") return t.status;
+  if(t.status==="proposed") return (t.expires_at&&new Date(t.expires_at)<=Date.now())?"nottaken":"proposed";
+  return "nottaken"; }
+function pager(key,total,rerender){ const pages=Math.max(1,Math.ceil(total/PER)); state.pg[key]=Math.min(state.pg[key]||1,pages);
+  if(pages<=1) return ""; const p=state.pg[key];
+  return `<div class="pager"><button class="chip" ${p<=1?"disabled":""} onclick="state.pg['${key}']=${p-1};${rerender}();window.scrollTo({top:0,behavior:'smooth'})">‹ Prev</button><span class="soft">Page ${p} of ${pages} · ${total} items</span><button class="chip" ${p>=pages?"disabled":""} onclick="state.pg['${key}']=${p+1};${rerender}();window.scrollTo({top:0,behavior:'smooth'})">Next ›</button></div>`; }
+function page(key,list){ const p=state.pg[key]||1; return list.slice((p-1)*PER,p*PER); }
 const ICON = {
   stock:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><path d="M6 3v4M6 15v6M18 3v6M18 17v4M12 6v3M12 17v4"/><rect x="4" y="7" width="4" height="8" rx="1"/><rect x="16" y="9" width="4" height="8" rx="1"/><rect x="10" y="9" width="4" height="8" rx="1"/></svg>`,
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v9";
-let state = {ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
+const VERSION="v10";
+let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
 function showErr(e){ const b=$("#errbar"); if(b){ b.classList.remove("hidden"); b.textContent="App error (please screenshot this): "+String(e&&e.message||e).slice(0,160); } }
@@ -308,11 +319,11 @@ function spark(id){
 function tradeCard(t){
   const right = t.status==="closed" ? `<b class="${t.result==="win"?"pos":"neg"}">${money(t.pnl_usd)}</b>`
     : t.status==="open" ? `<div class="uplbox">${uplHtml(t)}</div>`
-    : t.status==="proposed" ? `<span class="amb">waiting</span>` : `<span class="dim">history</span>`;
+    : bucket(t)==="proposed" ? `<span class="amb">waiting</span>` : `<span class="dim nt">${esc(NOT_TAKEN[t.status]||(t.status==="proposed"?"Expired unanswered":t.status))}<br><small>no money used</small></span>`;
   return `<div class="card" id="t-${esc(t.id)}"><div class="row"><div class="ico ${t.asset_class}">${ICON[t.asset_class]}</div>
     <div class="grow"><div style="font-weight:700">${esc(t.instrument.replace("_","/"))} <span class="pill ${t.side}">${t.side.toUpperCase()}</span></div>
     <small class="soft">${esc(t.mode==="shadow"?"study (no order)":t.mode==="demo"?"demo account":t.mode)}${t.setup?" · "+esc(t.setup):""}${t.r!=null?" · "+(t.r>0?"+":"")+(+t.r).toFixed(2)+"R":""}</small></div>${right}</div>
-    ${t.status!=="cancelled"?`<div class="rbox">${rangeBar(t)}</div>`:""}
+    ${bucket(t)!=="nottaken"?`<div class="rbox">${rangeBar(t)}</div>`:""}
     ${t.status==="open"?`<div class="row between" style="margin-top:4px"><small class="soft">live price <span class="num px">${t.last_price??"—"}</span><span class="arrow"></span></small><small class="amb ago">${t.liveAt&&Date.now()-t.liveAt<20000?"live":"stored price from the last scan, not live"}</small></div><div class="sbox">${spark(t.id)}</div>`:""}
     ${t.expectation?`<div class="soft" style="margin-top:8px;font-size:13px">${esc(t.expectation)}</div>`:""}
     <small class="dim">${t.opened_at?new Date(t.opened_at).toLocaleString():""}</small></div>`;
@@ -344,17 +355,34 @@ function renderHome(){
 }
 function chips(el, map, key, counts){
   el.innerHTML = Object.entries(map).map(([k,v])=>`<button class="chip ${state[key]===k?"on":""}" data-k="${k}">${key==="cls"&&k!=="all"?ICON[k].replace(/width="22" height="22"/,'width="14" height="14"'):""}${v}${counts&&counts[k]!=null?` <span class="n">${counts[k]}</span>`:""}</button>`).join("");
-  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{state[key]=b.dataset.k;renderTrades();});
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{state[key]=b.dataset.k;state.pg.t=1;renderTrades();});
 }
 function renderTrades(){
   const inCls=t=>state.cls==="all"||t.asset_class===state.cls;
-  const cnt={}; Object.keys(STATUSES).forEach(s=>cnt[s]=state.trades.filter(t=>inCls(t)&&(s==="all"||t.status===s)).length);
+  if(state.st==="cancelled") state.st="nottaken";
+  const cnt={}; Object.keys(STATUSES).forEach(s=>cnt[s]=state.trades.filter(t=>inCls(t)&&(s==="all"||bucket(t)===s)).length);
   chips($("#cls"), CLASSES, "cls"); chips($("#sts"), STATUSES, "st", cnt);
-  const list = state.trades.filter(t=>inCls(t)&&(state.st==="all"||t.status===state.st)).sort((a,b)=>({open:0,proposed:1,closed:2,cancelled:3}[a.status]-{open:0,proposed:1,closed:2,cancelled:3}[b.status])||new Date(b.closed_at||b.opened_at)-new Date(a.closed_at||a.opened_at));
-  $("#tlist").innerHTML = list.length ? list.map(tradeCard).join("") : `<div class="card empty">Nothing ${STATUSES[state.st].toLowerCase()} here yet.</div>`;
+  let list = state.trades.filter(t=>inCls(t)&&(state.st==="all"||bucket(t)===state.st));
+  let head="";
+  if(state.st==="closed"){
+    const money_=list.filter(t=>t.mode==="demo"), w=money_.filter(t=>t.result==="win"), l=money_.filter(t=>t.result!=="win");
+    const tot=money_.reduce((a,t)=>a+(+t.pnl_usd||0),0), wr=money_.length?Math.round(100*w.length/money_.length):null;
+    const oc={all:list.length, win:list.filter(t=>t.result==="win").length, loss:list.filter(t=>t.result&&t.result!=="win").length};
+    head=`<div class="card"><div class="row between"><div><div class="k">Closed demo trades</div><div class="big ${tot>=0?"pos":"neg"}" style="font-size:26px">${money(tot)}</div></div>${ring(wr,"#34d399")}</div>
+      <small class="soft"><b class="pos">${w.length} wins</b> · <b class="neg">${l.length} losses</b>${money_.length?` · avg ${money(tot/money_.length)} per trade`:" · none closed yet: open trades run 1–3 days"}</small></div>
+      <div class="chips" id="ocs">${Object.entries(OUTCOMES).map(([k,v])=>`<button class="chip ${state.oc===k?"on":""}" onclick="state.oc='${k}';state.pg.t=1;renderTrades()">${v} <span class="dim">${oc[k]}</span></button>`).join("")}</div>`;
+    if(state.oc==="win") list=list.filter(t=>t.result==="win"); else if(state.oc==="loss") list=list.filter(t=>t.result&&t.result!=="win");
+  } else if(state.st==="nottaken"){
+    const by={}; list.forEach(t=>{const k=NOT_TAKEN[t.status]||"Expired unanswered"; by[k]=(by[k]||0)+1;});
+    head=`<div class="card"><div class="k">Ideas that never became trades</div><small class="soft">These cost nothing: no order was placed. ${Object.entries(by).map(([k,v])=>`${v} ${k.toLowerCase()}`).join(" · ")||""}</small></div>`;
+  }
+  list.sort((a,b)=>({open:0,proposed:1,closed:2,nottaken:3}[bucket(a)]-{open:0,proposed:1,closed:2,nottaken:3}[bucket(b)])||new Date(b.closed_at||b.opened_at)-new Date(a.closed_at||a.opened_at));
+  const pg=pager("t",list.length,"renderTrades");
+  $("#tlist").innerHTML = head + (list.length ? page("t",list).map(tradeCard).join("") + pg : `<div class="card empty">Nothing here yet.</div>`);
 }
 function renderJournal(){
-  $("#jlist").innerHTML = state.journal.map((e,i)=>`<div style="position:relative"><span class="dot"></span><details class="card" ${i===0?"open":""}><summary style="cursor:pointer;list-style:none"><small class="soft">${esc(e.day)}</small><div style="font-weight:700">${esc(e.title.replace(/^\d{4}-\d{2}-\d{2}\s*/,"").replace(/^[:(—-]\s*/,"")||e.title)}</div></summary><div class="md">${md(e.body_md)}</div></details></div>`).join("") || `<div class="card empty">No journal yet.</div>`;
+  const jl=state.journal, jp=pager("j",jl.length,"renderJournal");
+  $("#jlist").innerHTML = page("j",jl).map((e,i)=>`<div style="position:relative"><span class="dot"></span><details class="card" ${i===0?"open":""}><summary style="cursor:pointer;list-style:none"><small class="soft">${esc(e.day)}</small><div style="font-weight:700">${esc(e.title.replace(/^\d{4}-\d{2}-\d{2}\s*/,"").replace(/^[:(—-]\s*/,"")||e.title)}</div></summary><div class="md">${md(e.body_md)}</div></details></div>`).join("")+jp || `<div class="card empty">No journal yet.</div>`;
 }
 function renderScores(){
   const sm=(state.snap.scoreboard||{}).markdown||"";
@@ -601,7 +629,7 @@ function deepLink(){
   if(location.hash==="#ideas"){ history.replaceState(null,"",location.pathname); show("ideas"); return; }
   const m=location.hash.match(/t=([^&]+)/); if(!m) return; const id=decodeURIComponent(m[1]); history.replaceState(null,"",location.pathname);
   const p=document.getElementById("pend-"+id); if(p){window.scrollTo({top:0});p.classList.add("flash");return;}
-  const t=state.trades.find(x=>x.id===id); if(!t) return; state.cls="all"; state.st=t.status; show("trades"); renderTrades();
+  const t=state.trades.find(x=>x.id===id); if(!t) return; state.cls="all"; state.st=bucket(t); state.pg.t=1; show("trades"); renderTrades();
   setTimeout(()=>{const el=document.getElementById("t-"+id); if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash");}},200);
 }
 function notifyNew(rows){
