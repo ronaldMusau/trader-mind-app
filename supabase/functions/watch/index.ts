@@ -54,12 +54,29 @@ async function alert(title: string, text: string, loud: boolean) {
                Click: "https://ronaldmusau.github.io/trader-mind-app/" } }).catch(() => {});
 }
 
+// If the hourly runs (Ronald's PC, or the Claude fallback) stop checking in for 2 hours, say so - at most every 6 hours.
+async function heartbeat(loud: boolean) {
+  const hb = (await sb("snapshots?key=eq.heartbeat&select=data"))[0]?.data;
+  if (!hb?.at) return null;
+  const ageH = (Date.now() - Date.parse(hb.at)) / 3_600_000;
+  if (ageH < 2) return null;
+  const st = (await sb("watch_state?trade_id=eq.__heartbeat__&select=acted_at"))[0];
+  if (st?.acted_at && Date.now() - Date.parse(st.acted_at) < 6 * 3_600_000) return null;
+  await alert("Trading runs have stopped", `No hourly run for ${ageH.toFixed(1)} h (last at ${String(hb.at).slice(11, 16)} UTC on ${hb.host ?? "the PC"}). ` +
+    "Check the PC is on, awake and online. Open trades are still protected by this minute watcher.", true);
+  await sb("watch_state?on_conflict=trade_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ trade_id: "__heartbeat__", action: `runs stopped ${ageH.toFixed(1)} h`, acted_at: new Date().toISOString(),
+                           updated_at: new Date().toISOString() }) });
+  return ageH;
+}
+
 Deno.serve(async (req) => {
   if (req.headers.get("x-watch-key") !== Deno.env.get("WATCH_KEY")) return new Response("no", { status: 401 });
   const done: string[] = [];
   try {
     const trades = await sb("trades?status=eq.open&mode=eq.demo&deal_id=not.is.null&select=id,instrument,side,entry,stop,target,deal_id");
-    if (!trades.length) return Response.json({ ok: true, open: 0 });
+    const stopped = await heartbeat(true).catch(() => null);   // urgent either way: Ronald needs to know
+    if (!trades.length) return Response.json({ ok: true, open: 0, runs_stopped_h: stopped });
     const live = Object.fromEntries((await cap("GET", "/api/v1/positions")).positions.map((p: any) => [p.position.dealId, p]));
     const state = Object.fromEntries((await sb("watch_state?select=*")).map((s: any) => [s.trade_id, s]));
     const st = ((await sb("settings?key=eq.main&select=data"))[0] ?? {}).data ?? {};
