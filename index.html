@@ -100,7 +100,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v8</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v9</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -158,6 +158,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
   </section>
 
   <section id="v-results" class="view hidden">
+    <div id="readyBox"></div>
     <div class="chips" id="rcls"></div>
     <div class="card" id="rhero"></div>
     <div class="grid2" id="rsplit"></div>
@@ -196,7 +197,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v8";
+const VERSION="v9";
 let state = {ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -365,7 +366,18 @@ function renderScores(){
 }
 
 /* ---------- results ---------- */
+function renderReady(){
+  const r=state.snap.readiness, hb=state.snap.heartbeat, box=$("#readyBox"); if(!box) return;
+  let h="";
+  if(hb&&hb.at){ const m=Math.round((Date.now()-Date.parse(hb.at))/60000);
+    h+=`<div class="card row between"><div><div class="k">Trading runs</div><small class="soft">${m<=75?"running normally":"no run for "+(m/60).toFixed(1)+" h: check the PC is on"}</small></div><span class="tag ${m<=75?"pos":"amb"}">last ${m<120?m+" min":(m/60).toFixed(1)+" h"} ago${hb.runner==="windows"?" · PC":" · Claude"}</span></div>`; }
+  if(r&&r.checks){ h+=`<div class="card"><div class="row between"><div class="k">Real-money readiness</div><span class="tag ${r.ready?"pos":"amb"}">${r.ready?"ready by the numbers":"not ready yet"}</span></div>
+    ${r.checks.map(c=>`<div class="row between" style="margin:8px 0;gap:10px"><span>${c.ok?"✓":"○"} ${esc(c.name)}</span><small class="soft" style="text-align:right">${esc(c.value)}</small></div>`).join("")}
+    <small class="dim">${esc(r.note||"")}</small></div>`; }
+  box.innerHTML=h;
+}
 function renderResults(){
+  try{ renderReady(); }catch(e){}
   chips($("#rcls"), CLASSES, "rcls"); $("#rcls").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.rcls=b.dataset.k;renderResults();});
   const C=state.trades.filter(t=>t.status==="closed"&&(state.rcls==="all"||t.asset_class===state.rcls));
   const gains=C.filter(t=>t.pnl_usd>0).reduce((s,t)=>s+ +t.pnl_usd,0), losses=C.filter(t=>t.pnl_usd<0).reduce((s,t)=>s+ +t.pnl_usd,0), net=gains+losses;
