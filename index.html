@@ -120,7 +120,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v19</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v20</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -213,6 +213,10 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
     <div class="card hero2"><div class="k">How the learning is going</div><div id="lrnHead"></div></div>
     <div class="card"><div class="row between"><div class="k">Where the money comes from</div><span class="tag">2 years · replayed</span></div>
       <div id="moneyBy"></div><small class="soft">Average result per trade in R (1R = the amount risked). Green = made money, red = lost. The two dots show the older and newer year: a market only counts as a money-maker if both are green.</small></div>
+    <div class="card"><div class="row between"><div class="k">Strategy lab</div><span class="tag" id="labWhen"></span></div>
+      <div class="chips" id="labTabs"></div><div id="lab"></div>
+      <small class="soft">Whole strategy families replayed on 5 years of every market, last 120 days sealed. Green = made money per trade. Dots = older and newer half. "Luck check" is the deflated Sharpe: near 0 means a result this good could be chance after trying this many strategies.</small></div>
+    <div class="card"><div class="row between"><div class="k">Real trades vs the plan</div><span class="tag" id="driftWhen"></span></div><div id="drift"></div></div>
     <div class="card"><div class="row between"><div class="k">The bench: watching closely</div><span class="tag" id="benchWhen"></span></div>
       <div id="benchSug"></div><div class="chips" id="benchTabs"></div><div id="bench"></div>
       <small class="soft">ACTIVE = traded now. BENCH = not traded, but watched. A bench candidate must be positive in both development halves, survive 50% wider spreads and most time blocks, then gets ONE look at the sealed last 120 days: pass = Proven, fail = Retired for good. Swaps happen only after your yes.</small></div>
@@ -261,7 +265,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v19";
+const VERSION="v20";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -488,6 +492,17 @@ function renderScores(){
   const nmx=1; state.nshow=state.nshow||8;
   $("#newsList").innerHTML=NS.slice(0,state.nshow).map(([k,v])=>rbar(k.replace("_","/"),+v.score,null,null,nmx,`${esc(v.reason||"")}${v.top&&v.top[0]?" · “"+esc(v.top[0].slice(0,70))+"…”":""}`,"")).join("")
     +(NS.length>state.nshow?`<button class="chip" onclick="state.nshow+=12;renderScores()">Show more (${NS.length-state.nshow})</button>`:"");
+  const SL=state.snap.strategies||{}, SG=SL.groups||{}; state.lt=state.lt||"crypto";
+  $("#labWhen").textContent=SL.made?new Date(SL.made).toLocaleDateString():"";
+  const LT={crypto:"Crypto",commodity:"Commodities",stock:"Stocks",forex:"Forex",pairs:"Pairs"};
+  $("#labTabs").innerHTML=Object.entries(LT).map(([k,v])=>`<button class="chip ${state.lt===k?"on":""}" onclick="state.lt='${k}';renderScores()">${v}</button>`).join("");
+  const FAM={tsmom:"12-month momentum",xsmom:"Strongest vs weakest",ma15_50:"Trend: MA15 × MA50",donchian:"55-day breakout",meanrev:"Mean reversion (z-score)",rsi2:"RSI(2) pullback",pairs:"Pairs trading",tom:"Turn of the month"};
+  const lrows=Object.entries(SG).filter(([k])=>k.endsWith("/"+state.lt)).sort((a,b)=>b[1].mean_r-a[1].mean_r), lmx=Math.max(0.2,...lrows.map(([k,v])=>Math.abs(v.mean_r||0)));
+  const looks=SL.looks||{};
+  $("#lab").innerHTML=lrows.length?lrows.map(([k,v])=>{const f=k.slice(6).split("/")[0], lk=looks[k];
+    return rbar(FAM[f]||f,v.mean_r||0,v.older,v.newer,lmx,`${v.n} trades · wider spreads ${(v.stress??0)>=0?"+":""}${(+v.stress||0).toFixed(2)}R · luck check ${v.dsr??"–"}${(SL.ready||[]).includes(k)?" · passed tests":""}${lk?" · hold-out "+lk.verdict:""}`);}).join(""):`<div class="empty">Runs every Friday.</div>`;
+  const DR=state.snap.drift||{}; $("#driftWhen").textContent=DR.made?new Date(DR.made).toLocaleDateString():"";
+  $("#drift").innerHTML=DR.made?`<div class="stats3"><div><b>${DR.closed_trades??0}</b><small>closed trades checked</small></div><div><b class="${(DR.avg_slippage_r??0)<-0.05?"neg":"pos"}">${DR.avg_slippage_r!=null?(DR.avg_slippage_r>=0?"+":"")+DR.avg_slippage_r+"R":"—"}</b><small>entry slippage</small></div><div><b class="${(DR.real_vs_assumed_spread_x??1)>1.2?"neg":"pos"}">${DR.real_vs_assumed_spread_x??"—"}×</b><small>real vs assumed spread</small></div></div><small class="soft">${esc(DR.verdict||"")}. A steady gap means a hidden cost or an execution bug.</small>`:`<div class="empty">Runs daily.</div>`;
   const ru=R.rules||[];
   $("#exitsT").innerHTML = ru.length ? `<table class="tbl"><tr><th>Rule</th><th>R/trade</th><th>Wins</th></tr>${ru.map((x,i)=>`<tr${i===0?' class="cur"':""}><td>${esc(x.rule)}</td><td class="${x.all.mean_r>=0?"pos":"neg"}">${x.all.mean_r>=0?"+":""}${x.all.mean_r.toFixed(3)}</td><td>${Math.round(100*x.all.win_rate)}%</td></tr>`).join("")}</table><small class="soft">${esc(R.verdict||"")}</small>` : `<div class="empty">Runs with the weekly replay.</div>`;
   setTimeout(()=>document.querySelectorAll(".rbf[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),60);
