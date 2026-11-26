@@ -120,7 +120,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v18</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v19</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -215,7 +215,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
       <div id="moneyBy"></div><small class="soft">Average result per trade in R (1R = the amount risked). Green = made money, red = lost. The two dots show the older and newer year: a market only counts as a money-maker if both are green.</small></div>
     <div class="card"><div class="row between"><div class="k">The bench: watching closely</div><span class="tag" id="benchWhen"></span></div>
       <div id="benchSug"></div><div class="chips" id="benchTabs"></div><div id="bench"></div>
-      <small class="soft">ACTIVE = traded now. BENCH = not traded, but watched so a replacement is always ready. A swap or drop is only a suggestion: it happens after you say yes.</small></div>
+      <small class="soft">ACTIVE = traded now. BENCH = not traded, but watched. A bench candidate must be positive in both development halves, survive 50% wider spreads and most time blocks, then gets ONE look at the sealed last 120 days: pass = Proven, fail = Retired for good. Swaps happen only after your yes.</small></div>
     <div class="card"><div class="row between"><div class="k">News score · on trial</div><span class="tag" id="newsWhen"></span></div>
       <div id="newsEval"></div><div id="newsList"></div>
       <small class="soft">Your PC's own models read the latest headlines (Qwen 3.5 for forex, commodities, crypto and indices; FinBERT for stocks). The score is recorded on every trade and only used to decide once trades that agreed with it clearly made more money.</small></div>
@@ -261,7 +261,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v18";
+const VERSION="v19";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -475,11 +475,11 @@ function renderScores(){
      + `<small class="soft">Money per chosen trade after each daily tournament. ${H.length<3?"More points appear every day as the models retrain.":""}</small>` : `<div class="empty">The first point appears after today's tournament.</div>`;
   const B=state.snap.bench||{}, BR=B.rows||[]; state.bt=state.bt||"weakening";
   $("#benchWhen").textContent=B.made?new Date(B.made).toLocaleDateString():"";
-  const ST={weakening:["Weakening","neg"],ready:["Ready on bench","pos"],healthy:["Active & healthy","pos"],watching:["Watching","amb"],benched:["Benched","dim"]};
+  const ST={weakening:["Weakening","neg"],proven:["Proven (hold-out passed)","pos"],healthy:["Active & healthy","pos"],watching:["Watching","amb"],retired:["Retired","dim"],benched:["Benched","dim"]};
   $("#benchSug").innerHTML=(B.suggestions||[]).length?`<div class="k" style="margin-top:6px">Suggestions</div>`+B.suggestions.map(x=>`<div class="sug">${x.drop?`<span class="neg">Drop ${esc(x.drop)}</span> <small class="soft">${esc(x.why)}</small><br>`:""}${x.instead?`<span class="pos">${x.drop?"→ use instead: ":"+ Add: "}${esc(x.instead)}</span> <small class="soft">${esc(x.instead_why)}</small>`:`<small class="soft">${esc(x.instead_why||"")}</small>`}</div>`).join(""):"";
   $("#benchTabs").innerHTML=Object.entries(ST).map(([k,v])=>`<button class="chip ${state.bt===k?"on":""}" onclick="state.bt='${k}';renderScores()">${v[0]} <span class="n">${(B.counts||{})[k]??0}</span></button>`).join("");
   const bl=BR.filter(r=>r.status===state.bt), bmx=Math.max(0.2,...bl.map(r=>Math.max(Math.abs(r.older||0),Math.abs(r.newer||0),Math.abs(r.replay_all||0))));
-  $("#bench").innerHTML=bl.length?bl.map(r=>rbar((r.active?"● ":"○ ")+r.label+(r.kind==="group"?" (type+setup)":""),r.replay_all||0,r.older,r.newer,bmx,`${r.active?"ACTIVE":"BENCH"} · ${r.n} replayed trades${r.live_n?` · real ${r.live_mean_r>=0?"+":""}${r.live_mean_r}R over ${r.live_n}`:""}`)).join(""):`<div class="empty">Nothing here right now.</div>`;
+  $("#bench").innerHTML=bl.length?bl.map(r=>rbar((r.active?"● ":"○ ")+r.label+(r.kind==="group"?" (type+setup)":""),r.replay_all||0,r.older,r.newer,bmx,`${r.active?"ACTIVE":"BENCH"} · ${r.n} replayed trades${r.live_n?` · real ${r.live_mean_r>=0?"+":""}${r.live_mean_r}R over ${r.live_n}`:""}${r.robust?` · wider spreads ${r.robust.stress_mean_r>=0?"+":""}${(+r.robust.stress_mean_r).toFixed(2)}R ${r.robust_ok?"✓":"✗"} · worst run ${r.robust.mc_dd95_r}R`:""}${r.holdout?` · hold-out ${r.holdout.verdict}`:""}`)).join(""):`<div class="empty">Nothing here right now.</div>`;
   const N=state.snap.news||{}, NS=Object.entries(N.scores||{}).filter(([k,v])=>v.score!=null).sort((a,b)=>Math.abs(b[1].score)-Math.abs(a[1].score));
   $("#newsWhen").textContent=N.made?new Date(N.made).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}):"";
   const E=N.eval||{}; const ag=E.agree||[0,null], ac=E.against||[0,null];
@@ -557,7 +557,7 @@ function mindStatus(){
   st.study={c:"ok",t:(fs.open??0)+" practising",d:["Paper-trades every signal on every market in the background (no money) so the models have more to learn from.",`${fs.open??0} practice trades open now.`]};
   st.models={c:M.promoted?"ok":"wait",t:M.promoted?"Using "+(M.champion||""):"Current method",d:[`${M.models_tried||"Several"} models compete every day; the winner is judged on MONEY made on months it never saw.`,M.verdict||"No tournament yet."],go:"rules"};
   const bc=B.counts||{};
-  st.bench={c:(bc.weakening||0)>0?"wait":"ok",t:`${bc.weakening||0} weak · ${bc.ready||0} ready`,d:[`Watching every market and setup: ${bc.healthy||0} healthy, ${bc.weakening||0} weakening, ${bc.ready||0} ready on the bench.`,...((B.suggestions||[]).slice(0,2).map(x=>x.drop?`Suggests dropping ${x.drop}${x.instead?" for "+x.instead:""}.`:`Suggests adding ${x.instead}.`))],go:"rules"};
+  st.bench={c:(bc.weakening||0)>0?"wait":"ok",t:`${bc.weakening||0} weak · ${bc.proven||0} proven`,d:[`Watching every market and setup: ${bc.healthy||0} healthy, ${bc.weakening||0} weakening, ${bc.ready||0} ready on the bench.`,...((B.suggestions||[]).slice(0,2).map(x=>x.drop?`Suggests dropping ${x.drop}${x.instead?" for "+x.instead:""}.`:`Suggests adding ${x.instead}.`))],go:"rules"};
   st.ready={c:R.ready?"ok":"wait",t:R.ready?"Ready":"Not ready",d:["The gate before real money is ever discussed: 200+ closed trades, profit with a safety margin, small drawdown, honest win chances, 4+ weeks.",R.verdict?String(R.verdict):"Still collecting trades."],go:"results"};
   st.ideas={c:wait.length?"wait":"ok",t:`${(rec.ideas||[]).length} checked · ${wait.length} waiting`,d:[`Last scan checked ${(rec.ideas||[]).length} markets; ${(rec.proposed||[]).length} became trade ideas.`,wait.length?`${wait.length} idea(s) waiting for you.`:"Nothing waiting for you."],go:"ideas"};
   st.risk={c:"ok",t:"$4 cap",d:["Max loss $4 per trade; demo only; at most 20 open; exposure cap per currency; auto trades pause after $10 lost in a day.","Only setups that made money in the 2-year replay are placed (no breakouts; forex and stocks pullbacks only)."]};
