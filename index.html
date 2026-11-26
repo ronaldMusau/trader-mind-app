@@ -72,7 +72,7 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:
 #mindSvg .nl{fill:#eaf0f6;font-size:9px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#121a24;stroke-width:3.2px;stroke-linejoin:round}#mindSvg .ns{fill:#9fb0c3;font-size:7.2px;text-anchor:middle;paint-order:stroke;stroke:#121a24;stroke-width:3px;stroke-linejoin:round}
 #mindSvg .ed.hl{stroke:#a78bfa;stroke-opacity:.9;stroke-width:1.8}#mindSvg .fb.hl{stroke-opacity:.9;stroke-width:1.8}#mindSvg .nd{transition:opacity .25s}#mindSvg .nd.flash circle:nth-of-type(1){stroke:#fff;stroke-width:4.5}#mindSvg .nd.flash{filter:drop-shadow(0 0 6px #fff)}
 .evlog{max-height:260px;overflow:auto;margin-top:6px}.evr{display:flex;gap:8px;align-items:baseline;padding:6px 2px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}.evd{width:8px;height:8px;border-radius:50%;flex:none;transform:translateY(-1px)}.evt{color:var(--soft);font-size:11px;flex:none;min-width:70px}#mindSvg .nd.dim{opacity:.28}#mindSvg .lay{fill:#5d6f84;font-size:8px;letter-spacing:.12em;text-transform:uppercase}
-#mindSvg .beat{animation:beat 2.4s ease-in-out infinite;transform-origin:180px 445px}@keyframes beat{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1.05)}}
+#mindSvg .beat{animation:beat 2.4s ease-in-out infinite;transform-origin:180px 515px}@keyframes beat{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1.05)}}
 #mindSvg .fire{animation:fire 1.8s ease-in-out infinite}@keyframes fire{0%,100%{opacity:.65}50%{opacity:1}}#mindSvg .nd.sel circle:nth-of-type(1){stroke-width:4}
 .mindcard{background:radial-gradient(120% 60% at 50% 40%,rgba(167,139,250,.10),transparent 70%),var(--card)}.mleg{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--soft);margin:4px 0 6px}.mleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
 .dotc{width:12px;height:12px;border-radius:50%;display:inline-block}
@@ -120,7 +120,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v20</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v21</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -179,9 +179,9 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 
   <section id="v-mind" class="view hidden">
     <div class="card mindcard"><div class="row between"><div><div class="k">Trader Mind · one brain</div><small class="soft" id="mindSub"></small></div><span class="tag" id="mindBeat">●</span></div>
-      <svg id="mindSvg" viewBox="0 0 360 915" width="100%" style="display:block;max-width:560px;margin:0 auto;touch-action:manipulation"></svg>
+      <svg id="mindSvg" viewBox="0 0 360 985" width="100%" style="display:block;max-width:560px;margin:0 auto;touch-action:manipulation"></svg>
       <div class="mleg"><span><i style="background:#34d399"></i>working</span><span><i style="background:#fbbf24"></i>waiting · on trial</span><span><i style="background:#f87171"></i>needs attention</span><span><i style="background:#5d6f84"></i>idle</span></div>
-      <small class="soft">Every part is a neuron: all 16 trading skills, the scheduled checks and you. Signals flow from the senses (prices, news, brokers, insiders, regime) through the thinking parts into decisions and trades, and every closed trade flows back to teach the models and the bench. Tap a neuron.</small></div>
+      <small class="soft">Every part is a neuron: all 16 trading skills, the strategy lab, hold-out, safeguards, drift check, dataset, the scheduled checks and you. Signals flow from the senses (prices, news, brokers, insiders, regime) through the thinking parts into decisions and trades, and every closed trade flows back to teach the models and the bench. Tap a neuron.</small></div>
     <div class="card" id="mindInfo"><div class="empty">Tap any neuron to see what it is doing right now.</div></div>
     <div class="card"><div class="row between"><div class="k">Replay a day</div><span class="tag" id="rpClock">--:--</span></div>
       <div class="chips" id="rpDays"></div>
@@ -265,7 +265,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v20";
+const VERSION="v21";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -516,37 +516,39 @@ function renderScores(){
 
 /* ---------- the Mind: the whole system as one network of neurons ---------- */
 const MIND_NODES=[
- // senses (two rows)
+ // senses
  {id:"prices",x:40,y:62,r:16,label:"Prices",g:"sense"},{id:"news",x:110,y:62,r:16,label:"News",g:"sense"},{id:"calendar",x:180,y:62,r:15,label:"Calendar",g:"sense"},
  {id:"capital",x:250,y:62,r:16,label:"Capital.com",g:"sense"},{id:"binance",x:320,y:62,r:16,label:"Binance",g:"sense"},
- {id:"regime",x:62,y:140,r:15,label:"Regime",g:"sense",skill:"trader-regime"},{id:"insider",x:140,y:140,r:14,label:"Insiders",g:"sense",skill:"trader-insider"},
- {id:"congress",x:218,y:140,r:14,label:"Congress",g:"sense",skill:"trader-pelosi"},{id:"earnings",x:296,y:140,r:14,label:"Earnings",g:"sense",skill:"trader-analyst"},
- // thinking (two rows)
+ {id:"regime",x:40,y:140,r:14,label:"Regime",g:"sense"},{id:"insider",x:110,y:140,r:14,label:"Insiders",g:"sense"},
+ {id:"congress",x:180,y:140,r:14,label:"Congress",g:"sense"},{id:"earnings",x:250,y:140,r:14,label:"Earnings",g:"sense"},{id:"dataguard",x:320,y:140,r:14,label:"Data guard",g:"sense"},
+ // thinking
  {id:"study",x:45,y:250,r:17,label:"Study",g:"think"},{id:"models",x:135,y:240,r:19,label:"Models",g:"think"},
  {id:"bench",x:225,y:240,r:17,label:"Bench",g:"think"},{id:"ready",x:315,y:250,r:16,label:"Readiness",g:"think"},
- {id:"scanner",x:40,y:330,r:14,label:"Scanner",g:"think",skill:"trader-scanner"},{id:"entry",x:110,y:338,r:14,label:"Entry",g:"think",skill:"trader-entry"},
- {id:"exit",x:180,y:342,r:14,label:"Exit plan",g:"think",skill:"trader-exit"},{id:"tm",x:250,y:338,r:14,label:"Time machine",g:"think",skill:"trader-timemachine"},
- {id:"agents",x:320,y:330,r:14,label:"AI agents",g:"think",skill:"trader-agents"},
+ {id:"scanner",x:40,y:330,r:14,label:"Scanner",g:"think"},{id:"entry",x:110,y:338,r:14,label:"Entry",g:"think"},
+ {id:"exit",x:180,y:342,r:14,label:"Exit plan",g:"think"},{id:"tm",x:250,y:338,r:14,label:"Time machine",g:"think"},{id:"agents",x:320,y:330,r:14,label:"AI agents",g:"think"},
+ {id:"lab",x:55,y:418,r:15,label:"Strategy lab",g:"think"},{id:"holdout",x:135,y:425,r:15,label:"Hold-out",g:"think"},
+ {id:"drift",x:225,y:425,r:15,label:"Drift check",g:"think"},{id:"dataset",x:305,y:418,r:15,label:"Dataset",g:"think"},
  // core
- {id:"core",x:180,y:445,r:34,label:"MIND",g:"core"},
+ {id:"core",x:180,y:515,r:34,label:"MIND",g:"core"},
  // deciding
- {id:"ideas",x:40,y:555,r:17,label:"Ideas",g:"decide"},{id:"risk",x:110,y:575,r:16,label:"Risk",g:"decide",skill:"trader-risk"},
- {id:"budget",x:180,y:585,r:15,label:"Budget",g:"decide",skill:"trader-budget"},{id:"you",x:250,y:575,r:17,label:"You",g:"decide"},
- {id:"claude",x:320,y:555,r:16,label:"Supervisor",g:"decide"},
- {id:"session",x:85,y:640,r:13,label:"Stock session",g:"decide"},{id:"updates",x:275,y:640,r:13,label:"Skill updates",g:"decide"},
+ {id:"ideas",x:40,y:625,r:17,label:"Ideas",g:"decide"},{id:"risk",x:110,y:645,r:16,label:"Risk",g:"decide"},
+ {id:"budget",x:180,y:655,r:15,label:"Budget",g:"decide"},{id:"you",x:250,y:645,r:17,label:"You",g:"decide"},{id:"claude",x:320,y:625,r:16,label:"Supervisor",g:"decide"},
+ {id:"session",x:45,y:715,r:13,label:"Stock session",g:"decide"},{id:"trend",x:130,y:722,r:14,label:"Crypto trend",g:"decide"},
+ {id:"breaker",x:220,y:722,r:14,label:"Breaker",g:"decide"},{id:"updates",x:310,y:715,r:13,label:"Skill updates",g:"decide"},
  // acting
- {id:"place",x:40,y:735,r:16,label:"Placing",g:"act"},{id:"broker",x:110,y:750,r:15,label:"Broker",g:"act",skill:"trader-broker"},
- {id:"watch",x:180,y:755,r:16,label:"Watcher",g:"act"},{id:"manage",x:250,y:750,r:16,label:"Manage",g:"act"},
- {id:"alerts",x:320,y:735,r:15,label:"Alerts",g:"act",skill:"trader-alerts"},
+ {id:"place",x:40,y:812,r:16,label:"Placing",g:"act"},{id:"broker",x:110,y:827,r:15,label:"Broker",g:"act"},
+ {id:"watch",x:180,y:832,r:16,label:"Watcher",g:"act"},{id:"manage",x:250,y:827,r:16,label:"Manage",g:"act"},{id:"alerts",x:320,y:812,r:15,label:"Alerts",g:"act"},
  // markets
- {id:"m_forex",x:48,y:865,r:18,label:"Forex",g:"mkt",cls:"forex"},{id:"m_commodity",x:136,y:875,r:18,label:"Commodities",g:"mkt",cls:"commodity"},
- {id:"m_stock",x:224,y:875,r:18,label:"Stocks",g:"mkt",cls:"stock"},{id:"m_crypto",x:312,y:865,r:18,label:"Crypto",g:"mkt",cls:"crypto"}];
+ {id:"m_forex",x:48,y:935,r:18,label:"Forex",g:"mkt",cls:"forex"},{id:"m_commodity",x:136,y:945,r:18,label:"Commodities",g:"mkt",cls:"commodity"},
+ {id:"m_stock",x:224,y:945,r:18,label:"Stocks",g:"mkt",cls:"stock"},{id:"m_crypto",x:312,y:935,r:18,label:"Crypto",g:"mkt",cls:"crypto"}];
 const MIND_EDGES=[["prices","study"],["prices","models"],["prices","ideas"],["prices","scanner"],["news","ideas"],["news","core"],["calendar","risk"],["capital","watch"],["capital","manage"],["binance","manage"],["binance","place"],
- ["regime","risk"],["regime","core"],["insider","core"],["congress","core"],["earnings","core"],["insider","scanner"],["earnings","scanner"],
+ ["regime","risk"],["regime","core"],["insider","core"],["congress","core"],["earnings","core"],["insider","scanner"],["earnings","scanner"],["dataguard","ideas"],["dataguard","core"],["prices","dataguard"],
  ["study","models"],["models","bench"],["models","core"],["bench","core"],["ready","core"],["study","core"],["prices","core"],["capital","core"],["binance","core"],["calendar","core"],
  ["scanner","entry"],["entry","exit"],["exit","tm"],["tm","core"],["agents","core"],
+ ["lab","bench"],["lab","core"],["holdout","lab"],["holdout","bench"],["drift","core"],["manage","drift"],["core","dataset"],["dataset","models"],
  ["core","ideas"],["core","risk"],["core","you"],["core","claude"],["core","budget"],["ideas","risk"],["budget","risk"],["risk","place"],["risk","broker"],["you","place"],["you","broker"],
  ["claude","manage"],["claude","bench"],["session","scanner"],["session","broker"],["updates","core"],
+ ["prices","trend"],["trend","risk"],["trend","place"],["capital","breaker"],["breaker","place"],["breaker","alerts"],
  ["place","m_forex"],["place","m_commodity"],["place","m_stock"],["place","m_crypto"],["broker","m_stock"],["watch","m_forex"],["watch","m_commodity"],["watch","m_stock"],
  ["manage","m_forex"],["manage","m_commodity"],["manage","m_stock"],["manage","m_crypto"],["manage","alerts"],["place","alerts"],["alerts","you"]];
 const MIND_FEEDBACK=[["m_forex","study"],["m_crypto","bench"],["m_commodity","models"],["m_stock","ready"]];   // results flow back and teach
@@ -599,6 +601,16 @@ function mindStatus(){
   st.agents={c:"idle",t:"on hold",d:["DeepSeek trading agents (several AI analysts debating a trade). On hold until reviewed and given credit; they would join as another input to test, never as a decision-maker."]};
   st.session={c:sessAge!=null&&sessAge<=3?"ok":"wait",t:lastSess?lastSess:"19:07 daily",d:["Scheduled daily at 12:07 New York (19:07 or 20:07 Nairobi): runs the whole US-stock skill chain on TSLA as a watch-only test, scores it and journals the result."]};
   st.updates={c:"ok",t:"Saturdays",d:["Every Saturday Claude pulls the upstream skill repos, reads every change for safety and reports SAFE/FLAG to you. Nothing is installed without your yes."]};
+  const G=S.guards||{}, SL=S.strategies||{}, DR=S.drift||{};
+  st.dataguard={c:(G.bad_data||[]).length?"wait":"ok",t:`${(G.bad_data||[]).length} skipped now`,d:["Skips a market whose prices are stale, frozen or show a spike, so nothing is traded on bad data.",(G.bad_data||[]).length?`Skipped in the last scan: ${G.bad_data.join(", ")} (market holiday or closed exchange).`:"All prices looked fine in the last scan."]};
+  st.lab={c:(SL.ready||[]).length?"wait":"ok",t:SL.made?`${Object.keys(SL.groups||{}).length} tested`:"Fridays",d:["Replays whole strategy families (momentum, mean reversion, trend, breakout, pairs, carry and more) on 5 years of every market, with the last 120 days sealed.",SL.ready&&SL.ready.length?`Passed the tests: ${SL.ready.map(x=>x.slice(6)).join(", ")}.`:"No family has passed all tests yet."],go:"rules"};
+  st.holdout={c:"ok",t:`${G.holdout_looks??0} looks used`,d:["The last 120 days are sealed. A candidate gets ONE look: pass = proven, fail = retired for good, too few trades = wait.",...(G.holdout_results||[]).map(r=>`${String(r.k).replace(/^strat:|^group:|^market:/,"")}: ${r.verdict}${r.mean_r!=null?" ("+(r.mean_r>=0?"+":"")+r.mean_r+"R, n="+r.n+")":""}`)],go:"rules"};
+  st.drift={c:/DRIFT/.test(DR.verdict||"")?"bad":DR.made?"ok":"idle",t:DR.made?`spread ${DR.real_vs_assumed_spread_x??"–"}×`:"daily",d:["Checks real trades against the plan: entry slippage, real vs assumed spread, and the real result vs its paper twin.",DR.verdict?`${DR.verdict} (${DR.closed_trades} trades; slippage ${DR.avg_slippage_r}R).`:"Runs daily."],go:"rules"};
+  st.dataset={c:G.dataset_rows?"ok":"idle",t:`${G.dataset_rows||0} records`,d:["Every decision saved with what the system saw, what it chose and what happened, plus plain-language question/answer pairs to train a local model on later.",`${G.dataset_rows||0} decisions so far; it grows every hour.`]};
+  const sig=G.trend_signals||[];
+  st.trend={c:sig.length?"ok":"wait",t:sig.length?`${sig.length} signal(s)`:"waiting breakout",d:["Forward test on Binance's fake-money exchange: buy BTC or ETH when it closes above its 55-day high; exit on a close below the 20-day low or after 80 days. $1 stake, same approvals and caps.",sig.length?`Recent signals: ${sig.map(x=>x.pair+" "+x.day).join(", ")}.`:"No breakout yet: a few signals per coin per year is normal."]};
+  const dd=G.equity&&G.equity_high_7d?((G.equity_high_7d-G.equity)/G.equity_high_7d*100):null;
+  st.breaker={c:G.breaker_on?"bad":"ok",t:G.breaker_on?"ON: paused":`${dd!=null?dd.toFixed(1):"–"}% of ${G.breaker_pct??3}%`,d:[`Circuit breaker: no new trades if demo equity falls ${G.breaker_pct??3}% below its 7-day high. Now ${dd!=null?dd.toFixed(2)+"% below":"no data yet"}.`,`Open risk: $${G.open_risk??"–"} of the $${G.risk_cap??30} cap (worst case if every open trade hit its stop).`,G.breaker_why||"Off: trading normally."]};
   for(const c of ["forex","commodity","stock","crypto"]){ const o=cnt(c), cl=closed.filter(t=>t.asset_class===c), v=pl(cl);
     st["m_"+c]={c:o.length?"ok":"idle",t:`${o.length} open · ${money(v)}`,d:[`${o.length} open now; ${cl.length} closed so far, total ${money(v)}.`,c==="commodity"?"The strongest market type in the 2-year replay: stakes x1.25.":c==="crypto"?"Binance test network, buys only.":"Pullback setups only (this type lost money on other setups)."],go:"results",cls:c}; }
   return {st,open};
@@ -615,7 +627,7 @@ function renderMind(){
       dots.push(`<g class="tn" data-t="${esc(t.id)}"><line x1="${n.x}" y1="${n.y}" x2="${n.x+rr*Math.cos(a)}" y2="${n.y+rr*Math.sin(a)}" stroke="${col}" stroke-opacity=".4"/><circle cx="${n.x+rr*Math.cos(a)}" cy="${n.y+rr*Math.sin(a)}" r="4.2" fill="${col}"><title>${esc(t.instrument)}</title></circle></g>`);});});
   svg.innerHTML=`<defs><radialGradient id="coreG"><stop offset="0" stop-color="#a78bfa" stop-opacity=".9"/><stop offset="1" stop-color="#60a5fa" stop-opacity=".15"/></radialGradient>
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-    ${[["Senses",24],["Thinking",205],["Deciding",515],["Acting",700],["Markets",828]].map(([t,y])=>`<text class="lay" x="2" y="${y}">${t}</text>`).join("")}
+    ${[["Senses",24],["Thinking",205],["Deciding",585],["Acting",770],["Markets",898]].map(([t,y])=>`<text class="lay" x="2" y="${y}">${t}</text>`).join("")}
     <g id="medges">${MIND_EDGES.map(([a,b])=>line(a,b,"ed")).join("")}${fb}</g><g id="pulses"></g><g id="evp"></g>${dots.join("")}
     ${MIND_NODES.map(n=>{const s=st[n.id]||{c:"idle"},col=COL[s.c];return `<g class="nd" data-n="${n.id}" style="cursor:pointer">
       ${n.id==="core"?`<circle cx="${n.x}" cy="${n.y}" r="${n.r+14}" fill="url(#coreG)" class="beat"/>`:""}
