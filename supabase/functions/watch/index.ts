@@ -1,7 +1,8 @@
 // watch: checks Ronald's open Capital.com DEMO trades every minute (called by pg_cron) and acts at once.
 // It can ONLY reduce risk: move a stop to breakeven, or close a trade whose profit is fading.
 // It never opens, adds to or enlarges a trade. Demo host only. The hourly manager (capital_demo.py manage)
-// keeps the slower rules (trend flip, 72 h limit) and records exits and P/L for Results.
+// keeps the slower rules (trend flip, 72 h limit). When a trade's position is gone at the broker, this watcher also
+// records the real exit (price, reason, R, P/L) so the app stays true even when Ronald's PC is off (Lesson 40).
 // Secrets: CAPITAL_API_KEY, CAPITAL_LOGIN, CAPITAL_API_PASSWORD, WATCH_KEY, NTFY_TOPIC (+ built-in SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)
 const DEMO = "https://demo-api-capital.backend-capital.com"; // demo only, on purpose
 const BREAKEVEN_AT_R = 1.0, FADE_PEAK_R = 0.8, FADE_EXIT_R = 0.25; // same numbers as the hourly manager (v2 rules)
@@ -70,11 +71,46 @@ async function heartbeat(loud: boolean) {
   return ageH;
 }
 
+// Capital.com gives at most 1 day of history per request (Lesson 39): read the last 3 days in 1-day windows, once per run.
+let hist: any[] | null = null;
+async function history() {
+  if (hist) return hist;
+  hist = [];
+  const iso = (d: Date) => d.toISOString().slice(0, 19);
+  let end = new Date();
+  for (let i = 0; i < 3; i++) {
+    const from = new Date(end.getTime() - 86_400_000);
+    const j = await cap("GET", `/api/v1/history/activity?from=${iso(from)}&to=${iso(end)}&detailed=true`).catch(() => null);
+    hist.push(...(j?.activities ?? []));
+    end = from;
+  }
+  return hist;
+}
+const SRC: Record<string, string> = { SL: "stop hit", TP: "target hit", USER: "closed (watcher or by hand)", CLOSE_OUT: "margin close-out" };
+
+async function recordClose(t: any) {
+  const acts = (await history()).filter((x: any) => x.dealId === t.deal_id && x.source !== "SYSTEM" && x.details?.level)
+    .sort((a: any, b: any) => String(a.dateUTC).localeCompare(String(b.dateUTC)));
+  const x = acts.length > 1 ? acts[acts.length - 1] : null;      // the first row is the opening fill
+  if (!x) return null;
+  const exit = +x.details.level, long = t.side === "buy", entry = +t.entry, risk = Math.abs(entry - +t.stop) || 1e-9;
+  const r = (long ? exit - entry : entry - exit) / risk;
+  const w = (await sb(`watch_state?trade_id=eq.${encodeURIComponent(t.id)}&select=action`))[0]?.action ?? "";
+  const why = x.source === "USER" && String(w).startsWith("closed") ? "minute watcher " + w : (SRC[x.source] ?? x.source);
+  await sb(`trades?id=eq.${encodeURIComponent(t.id)}`, { method: "PATCH", headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ status: "closed", exit, closed_at: String(x.dateUTC).slice(0, 19) + "Z", r: +r.toFixed(3),
+      result: r > 0 ? "win" : "loss", pnl_usd: t.risk_usd != null ? +(r * Math.abs(+t.risk_usd)).toFixed(2) : null,
+      expectation: `Closed at ${exit}: ${why} (recorded by the cloud watcher; the PC refines P/L to the broker's figure).`,
+      updated_at: new Date().toISOString() }) });
+  return `${t.instrument}: recorded close at ${exit} (${why}, ${r >= 0 ? "+" : ""}${r.toFixed(2)}R)`;
+}
+
 Deno.serve(async (req) => {
   if (req.headers.get("x-watch-key") !== Deno.env.get("WATCH_KEY")) return new Response("no", { status: 401 });
   const done: string[] = [];
+  hist = null;                                            // fresh broker history each minute
   try {
-    const trades = await sb("trades?status=eq.open&mode=eq.demo&deal_id=not.is.null&select=id,instrument,side,entry,stop,target,deal_id");
+    const trades = await sb("trades?status=eq.open&mode=eq.demo&deal_id=not.is.null&select=id,instrument,side,entry,stop,target,deal_id,risk_usd,opened_at");
     const stopped = await heartbeat(true).catch(() => null);   // urgent either way: Ronald needs to know
     if (!trades.length) return Response.json({ ok: true, open: 0, runs_stopped_h: stopped });
     const live = Object.fromEntries((await cap("GET", "/api/v1/positions")).positions.map((p: any) => [p.position.dealId, p]));
@@ -83,7 +119,11 @@ Deno.serve(async (req) => {
     const loud = watching(st);
     for (const t of trades) {
       const p = live[t.deal_id];
-      if (!p) continue;                                   // already closed at the broker: the hourly manager records it
+      if (!p) {                                           // closed at the broker: record it now (the PC may be off)
+        const msg = await recordClose(t).catch(() => null);
+        if (msg) done.push(msg);
+        continue;
+      }
       const pos = p.position, long = pos.direction === "BUY";
       const price = long ? p.market.bid : p.market.offer, entry = +pos.level;
       const risk = Math.abs(entry - +t.stop) || 1e-9;
