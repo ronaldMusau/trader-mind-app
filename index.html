@@ -67,6 +67,7 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tgrid .empty,.tgrid .pager{grid-column:1/-1}.tc{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;font-size:13px}.tc svg{display:block;margin:4px 0}.tc b{white-space:nowrap}
 .inp{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 8px}
 .sug{background:var(--card2);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:13px}
+.newsl{margin-top:10px;font-size:13px;line-height:1.4}.nb{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-weight:700}.nb.up{color:var(--green);border-color:rgba(52,211,153,.5)}.nb.dn{color:var(--red);border-color:rgba(248,113,113,.5)}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px}.pager .chip[disabled]{opacity:.35}.nt{text-align:right;font-size:12px;line-height:1.2}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:flex;gap:6px;align-items:center}
@@ -111,7 +112,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v14</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v15</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -192,6 +193,9 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
     <div class="card"><div class="row between"><div class="k">The bench: watching closely</div><span class="tag" id="benchWhen"></span></div>
       <div id="benchSug"></div><div class="chips" id="benchTabs"></div><div id="bench"></div>
       <small class="soft">ACTIVE = traded now. BENCH = not traded, but watched so a replacement is always ready. A swap or drop is only a suggestion: it happens after you say yes.</small></div>
+    <div class="card"><div class="row between"><div class="k">News score · on trial</div><span class="tag" id="newsWhen"></span></div>
+      <div id="newsEval"></div><div id="newsList"></div>
+      <small class="soft">Your PC's own models read the latest headlines (Qwen 3.5 for forex, commodities, crypto and indices; FinBERT for stocks). The score is recorded on every trade and only used to decide once trades that agreed with it clearly made more money.</small></div>
     <div class="card"><div class="row between"><div class="k">Model tournament</div><span class="tag" id="tourWhen"></span></div>
       <div id="tour"></div><small class="soft">Each bar = money per trade the model would have chosen, on months it never saw. The last bar is the method in use now. A model replaces it only if it earns more and passes a final exam.</small></div>
     <div class="card"><div class="k">Model progress over time</div><div id="progress"></div></div>
@@ -233,7 +237,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v14";
+const VERSION="v15";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -414,9 +418,9 @@ function renderJournal(){
   $("#jlist").innerHTML = page("j",jl).map((e,i)=>`<div style="position:relative"><span class="dot"></span><details class="card" ${i===0?"open":""}><summary style="cursor:pointer;list-style:none"><small class="soft">${esc(e.day)}</small><div style="font-weight:700">${esc(e.title.replace(/^\d{4}-\d{2}-\d{2}\s*/,"").replace(/^[:(—-]\s*/,"")||e.title)}</div></summary><div class="md">${md(e.body_md)}</div></details></div>`).join("")+jp || `<div class="card empty">No journal yet.</div>`;
 }
 const NICE={commodity:"Commodities",crypto:"Crypto",forex:"Forex",stock:"Stocks","setup:pullback":"Pullback setups","setup:trend":"Trend setups","setup:breakout":"Breakout setups","side:buy":"Buys","side:sell":"Sells"};
-function rbar(label,v,o,n,max,sub){ // diverging bar around 0 with older/newer dots
+function rbar(label,v,o,n,max,sub,unit="R"){ // diverging bar around 0 with older/newer dots
   const sc=x=>50+Math.max(-48,Math.min(48,x/max*48)), w=Math.abs(sc(v)-50), left=v>=0?50:sc(v), col=v>=0?"var(--green)":"var(--red)";
-  return `<div class="rb"><div class="row between"><span>${esc(label)}</span><b class="${v>=0?"pos":"neg"}">${v>=0?"+":""}${v.toFixed(3)}R</b></div>
+  return `<div class="rb"><div class="row between"><span>${esc(label)}</span><b class="${v>=0?"pos":"neg"}">${v>=0?"+":""}${v.toFixed(unit?3:2)}${unit}</b></div>
    <div class="rbt"><div class="rbz"></div><div class="rbf" style="left:${left}%;width:0;background:${col}" data-w="${w}"></div>
    ${o!=null?`<i class="dot2" title="older year" style="left:${sc(o)}%;background:${o>=0?"#34d399":"#f87171"}"></i>`:""}${n!=null?`<i class="dot2 n" title="newer year" style="left:${sc(n)}%;background:${n>=0?"#34d399":"#f87171"}"></i>`:""}</div>
    ${sub?`<small class="dim">${sub}</small>`:""}</div>`;}
@@ -452,6 +456,14 @@ function renderScores(){
   $("#benchTabs").innerHTML=Object.entries(ST).map(([k,v])=>`<button class="chip ${state.bt===k?"on":""}" onclick="state.bt='${k}';renderScores()">${v[0]} <span class="n">${(B.counts||{})[k]??0}</span></button>`).join("");
   const bl=BR.filter(r=>r.status===state.bt), bmx=Math.max(0.2,...bl.map(r=>Math.max(Math.abs(r.older||0),Math.abs(r.newer||0),Math.abs(r.replay_all||0))));
   $("#bench").innerHTML=bl.length?bl.map(r=>rbar((r.active?"● ":"○ ")+r.label+(r.kind==="group"?" (type+setup)":""),r.replay_all||0,r.older,r.newer,bmx,`${r.active?"ACTIVE":"BENCH"} · ${r.n} replayed trades${r.live_n?` · real ${r.live_mean_r>=0?"+":""}${r.live_mean_r}R over ${r.live_n}`:""}`)).join(""):`<div class="empty">Nothing here right now.</div>`;
+  const N=state.snap.news||{}, NS=Object.entries(N.scores||{}).filter(([k,v])=>v.score!=null).sort((a,b)=>Math.abs(b[1].score)-Math.abs(a[1].score));
+  $("#newsWhen").textContent=N.made?new Date(N.made).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}):"";
+  const E=N.eval||{}; const ag=E.agree||[0,null], ac=E.against||[0,null];
+  $("#newsEval").innerHTML=N.made?`<div class="stats3"><div><b>${E.n??0}</b><small>trades with a score</small></div><div><b class="${(ag[1]??0)>=0?"pos":"neg"}">${ag[1]!=null?(ag[1]>=0?"+":"")+ag[1].toFixed(2)+"R":"—"}</b><small>when news agreed (${ag[0]})</small></div><div><b class="${(ac[1]??0)>=0?"pos":"neg"}">${ac[1]!=null?(ac[1]>=0?"+":"")+ac[1].toFixed(2)+"R":"—"}</b><small>when against (${ac[0]})</small></div></div>
+    <div class="chip2 ${E.passes?"ok":""}">${E.passes?"Passed: ready to propose using it":"On trial: needs 40+ trades each way and a clear gap"}</div>`:`<div class="empty">First scores arrive after the next hourly run on your PC.</div>`;
+  const nmx=1; state.nshow=state.nshow||8;
+  $("#newsList").innerHTML=NS.slice(0,state.nshow).map(([k,v])=>rbar(k.replace("_","/"),+v.score,null,null,nmx,`${esc(v.reason||"")}${v.top&&v.top[0]?" · “"+esc(v.top[0].slice(0,70))+"…”":""}`,"")).join("")
+    +(NS.length>state.nshow?`<button class="chip" onclick="state.nshow+=12;renderScores()">Show more (${NS.length-state.nshow})</button>`:"");
   const ru=R.rules||[];
   $("#exitsT").innerHTML = ru.length ? `<table class="tbl"><tr><th>Rule</th><th>R/trade</th><th>Wins</th></tr>${ru.map((x,i)=>`<tr${i===0?' class="cur"':""}><td>${esc(x.rule)}</td><td class="${x.all.mean_r>=0?"pos":"neg"}">${x.all.mean_r>=0?"+":""}${x.all.mean_r.toFixed(3)}</td><td>${Math.round(100*x.all.win_rate)}%</td></tr>`).join("")}</table><small class="soft">${esc(R.verdict||"")}</small>` : `<div class="empty">Runs with the weekly replay.</div>`;
   setTimeout(()=>document.querySelectorAll(".rbf[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),60);
@@ -577,6 +589,11 @@ function sizeFor(t, stake){
   const units=Math.floor(stake/(dist*conv)/step+1e-9)*step;
   return {units:+units.toFixed(6), risk:+(units*dist*conv).toFixed(2)};
 }
+function newsOf(pair){ const n=((state.snap.news||{}).scores||{})[pair]; return n&&n.score!=null?n:null; }
+function newsLine(pair,side){ const n=newsOf(pair); if(!n) return "";
+  const v=+n.score, lean=v>=0.2?"bullish":v<=-0.2?"bearish":"neutral", agree=side?((side==="buy"?1:-1)*v):0;
+  const tag=side?(agree>=0.2?`<span class="pos">agrees with this ${side}</span>`:agree<=-0.2?`<span class="neg">against this ${side}</span>`:`<span class="soft">no clear lean</span>`):"";
+  return `<div class="newsl"><span class="nb ${v>=0.2?"up":v<=-0.2?"dn":""}">News ${v>=0?"+":""}${v.toFixed(2)} ${lean}</span> ${tag}<br><small class="soft">${esc(n.reason||"")} · ${esc(n.model||"")} · on trial, not used to decide</small></div>`; }
 function ideaCard(t){
   const min=Math.max(0.01,+t.stake_min||0), max=+t.stake_max||4;
   const st=state.stakes[t.id] ?? +t.stake_default ?? min;
@@ -591,6 +608,7 @@ function ideaCard(t){
    <div class="prob"><div class="rng" style="left:${lo*100}%;width:${(hi-lo)*100}%"></div><div class="be" style="left:${be*100}%" title="break-even"></div><div class="pt" style="left:calc(${p*100}% - 2px)"></div></div>
    <div class="range-l"><span>0%</span><span class="amb">break-even ${Math.round(be*100)}%</span><span>100%</span></div>
    <div class="row between" style="margin-top:10px"><span class="soft">Average result per $1 risked</span><b class="${(t.exp_r||0)>0?"pos":"neg"}">${(t.exp_r>0?"+":"")}${(+t.exp_r||0).toFixed(2)}</b></div>
+   ${newsLine(t.instrument,t.side)}
    <div class="k" style="margin-top:14px">Your stake (max loss)</div>
    <div class="stake"><button onclick="nudge('${esc(t.id)}',-0.25)">−</button>
      <input type="number" inputmode="decimal" step="0.25" min="${min}" max="${max}" value="${st.toFixed(2)}" oninput="setStake('${esc(t.id)}',this.value,true)">
@@ -637,7 +655,7 @@ function renderIdeas(){
   const live=new Set(ids.map(t=>t.instrument));
   const rest=r.ideas.filter(x=>!live.has(x.pair)&&(state.icls==="all"||(x.asset_class||"forex")===state.icls));
   $("#ideaOthers").innerHTML = rest.length ? `<div class="card"><div class="row between"><div class="k">Everything the scanner checked</div><small class="soft">${new Date(r.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</small></div>
-    ${rest.map(x=>`<div class="row between" style="margin:10px 0;gap:8px"><div><b>${esc(x.pair.replace("_","/"))}</b> <span class="pill ${x.side}">${x.side.toUpperCase()}</span> <small class="soft">${esc(x.kind)}</small><div><small class="dim">${esc(x.skip||"not offered this run")}</small></div></div>
+    ${rest.map(x=>`<div class="row between" style="margin:10px 0;gap:8px"><div><b>${esc(x.pair.replace("_","/"))}</b> <span class="pill ${x.side}">${x.side.toUpperCase()}</span> <small class="soft">${esc(x.kind)}</small>${newsOf(x.pair)?` <small class="${newsOf(x.pair).score>=0.2?"pos":newsOf(x.pair).score<=-0.2?"neg":"soft"}">news ${newsOf(x.pair).score>=0?"+":""}${(+newsOf(x.pair).score).toFixed(1)}</small>`:""}<div><small class="dim">${esc(x.skip||"not offered this run")}</small></div></div>
       <div style="text-align:right;flex:none"><b class="${x.exp_r>0?"pos":"neg"}">${Math.round(100*x.win_prob)}%</b><div><small class="soft">${Math.round(100*x.win_lo)}–${Math.round(100*x.win_hi)}%</small></div></div></div>`).join("")}
     <small class="dim">${esc(r.method||"")}</small></div>` : "";
 }
