@@ -120,7 +120,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v21</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v22</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -265,7 +265,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v21";
+const VERSION="v22";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -467,7 +467,7 @@ function renderScores(){
   $("#lrnHead").innerHTML=`<div class="stats3"><div><b>${ev?ev.toLocaleString():"—"}</b><small>study trades learned from</small></div><div><b>${L.models_tried??"—"}</b><small>models competing</small></div><div><b class="${tot>=0?"pos":"neg"}">${closed.length}</b><small>real demo trades closed</small></div></div>
    <div class="chip2 ${L.promoted?"ok":""}">${L.champion?(L.promoted?"Using: "+esc(L.champion):"Using: current method · best challenger "+esc(L.champion)):"No tournament yet"}</div>
    <small class="soft">${esc(L.verdict||"")}</small>`;
-  const bc=R.by_class||{}, keys=Object.keys(bc);
+  const bc=Object.fromEntries(Object.entries(R.by_class||{}).filter(([k,v])=>!k.startsWith("_")&&v&&v.all&&v.older&&v.newer)), keys=Object.keys(bc);
   const mx=Math.max(0.15,...keys.map(k=>Math.abs(bc[k].all.mean_r||0)));
   $("#moneyBy").innerHTML = keys.length ? ["commodity","crypto","forex","stock"].filter(k=>bc[k]).map(k=>rbar(NICE[k],bc[k].all.mean_r,bc[k].older.mean_r,bc[k].newer.mean_r,mx,`${bc[k].all.n.toLocaleString()} trades · wins ${Math.round(100*bc[k].all.win_rate)}% · profit factor ${bc[k].all.profit_factor}`)).join("")
      + `<div class="k" style="margin-top:12px">By setup</div>` + keys.filter(k=>k.startsWith("setup:")).map(k=>rbar(NICE[k]||k,bc[k].all.mean_r,bc[k].older.mean_r,bc[k].newer.mean_r,Math.max(mx,0.3),`${bc[k].all.n.toLocaleString()} trades`)).join("")
@@ -477,7 +477,7 @@ function renderScores(){
   $("#tour").innerHTML = rk.length ? rk.map((r,i)=>rbar((i===0?"🏆 ":"")+r.model,r.avg_r_taken,null,null,tmx,`Brier ${r.brier_exam?.toFixed(3)} on the final exam`)).join("")+(cur!=null?rbar("current method (in use)",cur,null,null,tmx,"what the live system does now"):"") : `<div class="empty">No tournament yet.</div>`;
   $("#progress").innerHTML = H.length ? lineChart([{name:"best model",col:"#a78bfa",vals:H.map(h=>h.champ_r)},{name:"current method",col:"#60a5fa",vals:H.map(h=>h.current_r)}],H.map(h=>new Date(h.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})))
      + `<small class="soft">Money per chosen trade after each daily tournament. ${H.length<3?"More points appear every day as the models retrain.":""}</small>` : `<div class="empty">The first point appears after today's tournament.</div>`;
-  const B=state.snap.bench||{}, BR=B.rows||[]; state.bt=state.bt||"weakening";
+  const B=state.snap.bench||{}, BR=(B.rows||[]).filter(r=>r&&r.label); state.bt=state.bt||"weakening";
   $("#benchWhen").textContent=B.made?new Date(B.made).toLocaleDateString():"";
   const ST={weakening:["Weakening","neg"],proven:["Proven (hold-out passed)","pos"],healthy:["Active & healthy","pos"],watching:["Watching","amb"],retired:["Retired","dim"],benched:["Benched","dim"]};
   $("#benchSug").innerHTML=(B.suggestions||[]).length?`<div class="k" style="margin-top:6px">Suggestions</div>`+B.suggestions.map(x=>`<div class="sug">${x.drop?`<span class="neg">Drop ${esc(x.drop)}</span> <small class="soft">${esc(x.why)}</small><br>`:""}${x.instead?`<span class="pos">${x.drop?"→ use instead: ":"+ Add: "}${esc(x.instead)}</span> <small class="soft">${esc(x.instead_why)}</small>`:`<small class="soft">${esc(x.instead_why||"")}</small>`}</div>`).join(""):"";
@@ -492,7 +492,7 @@ function renderScores(){
   const nmx=1; state.nshow=state.nshow||8;
   $("#newsList").innerHTML=NS.slice(0,state.nshow).map(([k,v])=>rbar(k.replace("_","/"),+v.score,null,null,nmx,`${esc(v.reason||"")}${v.top&&v.top[0]?" · “"+esc(v.top[0].slice(0,70))+"…”":""}`,"")).join("")
     +(NS.length>state.nshow?`<button class="chip" onclick="state.nshow+=12;renderScores()">Show more (${NS.length-state.nshow})</button>`:"");
-  const SL=state.snap.strategies||{}, SG=SL.groups||{}; state.lt=state.lt||"crypto";
+  const SL=state.snap.strategies||{}, SG=Object.fromEntries(Object.entries(SL.groups||{}).filter(([k,v])=>!k.startsWith("_")&&v&&v.n!=null)); state.lt=state.lt||"crypto";
   $("#labWhen").textContent=SL.made?new Date(SL.made).toLocaleDateString():"";
   const LT={crypto:"Crypto",commodity:"Commodities",stock:"Stocks",forex:"Forex",pairs:"Pairs"};
   $("#labTabs").innerHTML=Object.entries(LT).map(([k,v])=>`<button class="chip ${state.lt===k?"on":""}" onclick="state.lt='${k}';renderScores()">${v}</button>`).join("");
@@ -503,7 +503,7 @@ function renderScores(){
     return rbar(FAM[f]||f,v.mean_r||0,v.older,v.newer,lmx,`${v.n} trades · wider spreads ${(v.stress??0)>=0?"+":""}${(+v.stress||0).toFixed(2)}R · luck check ${v.dsr??"–"}${(SL.ready||[]).includes(k)?" · passed tests":""}${lk?" · hold-out "+lk.verdict:""}`);}).join(""):`<div class="empty">Runs every Friday.</div>`;
   const DR=state.snap.drift||{}; $("#driftWhen").textContent=DR.made?new Date(DR.made).toLocaleDateString():"";
   $("#drift").innerHTML=DR.made?`<div class="stats3"><div><b>${DR.closed_trades??0}</b><small>closed trades checked</small></div><div><b class="${(DR.avg_slippage_r??0)<-0.05?"neg":"pos"}">${DR.avg_slippage_r!=null?(DR.avg_slippage_r>=0?"+":"")+DR.avg_slippage_r+"R":"—"}</b><small>entry slippage</small></div><div><b class="${(DR.real_vs_assumed_spread_x??1)>1.2?"neg":"pos"}">${DR.real_vs_assumed_spread_x??"—"}×</b><small>real vs assumed spread</small></div></div><small class="soft">${esc(DR.verdict||"")}. A steady gap means a hidden cost or an execution bug.</small>`:`<div class="empty">Runs daily.</div>`;
-  const ru=R.rules||[];
+  const ru=(R.rules||[]).filter(x=>x&&x.all);
   $("#exitsT").innerHTML = ru.length ? `<table class="tbl"><tr><th>Rule</th><th>R/trade</th><th>Wins</th></tr>${ru.map((x,i)=>`<tr${i===0?' class="cur"':""}><td>${esc(x.rule)}</td><td class="${x.all.mean_r>=0?"pos":"neg"}">${x.all.mean_r>=0?"+":""}${x.all.mean_r.toFixed(3)}</td><td>${Math.round(100*x.all.win_rate)}%</td></tr>`).join("")}</table><small class="soft">${esc(R.verdict||"")}</small>` : `<div class="empty">Runs with the weekly replay.</div>`;
   setTimeout(()=>document.querySelectorAll(".rbf[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),60);
   const sm=(state.snap.scoreboard||{}).markdown||"";
