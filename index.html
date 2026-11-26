@@ -116,13 +116,16 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 .day label{font-size:12px;color:var(--soft);display:flex;gap:4px;align-items:center}
 .modechip{display:flex;align-items:center;gap:8px;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:50;animation:rise .3s ease}
+.rtab{font-size:12px}.rtab .rh,.rtab .rrow{display:grid;grid-template-columns:18px 1fr 62px 62px 34px;gap:6px;align-items:center;padding:6px 4px;border-bottom:1px solid #1a2636}
+.rtab .rh{color:#5d6f84;font-size:10px;text-transform:uppercase;letter-spacing:.04em}.rtab .rrow{cursor:pointer}.rtab .rrow.on{background:#16263a;border-radius:8px}
+.rtab .rrow span:nth-child(n+3){text-align:right;font-variant-numeric:tabular-nums}.rtab em{font-style:normal;font-size:10px}.rtab .pin{color:#34d399}
 </style>
 </head>
 <body>
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v23</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v24</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -231,7 +234,11 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
       <small class="soft">Your PC's own models read the latest headlines (Qwen 3.5 for forex, commodities, crypto and indices; FinBERT for stocks). The score is recorded on every trade and only used to decide once trades that agreed with it clearly made more money.</small></div>
     <div class="card"><div class="row between"><div class="k">Model tournament</div><span class="tag" id="tourWhen"></span></div>
       <div id="tour"></div><small class="soft">Each bar = money per trade the model would have chosen, on months it never saw. The last bar is the method in use now. A model replaces it only if it earns more and passes a final exam.</small></div>
-    <div class="card"><div class="k">Model progress over time</div><div id="progress"></div></div>
+    <div class="card" id="raceCard"><div class="row between"><div class="k">Model race</div><span class="tag" id="raceWhen"></span></div>
+      <div class="row" id="raceRange" style="gap:6px;margin:8px 0"></div>
+      <div id="race"></div>
+      <div id="raceBoard" style="margin-top:10px"></div>
+      <small class="soft" id="raceNote"></small></div>
     <div class="card"><div class="k">Exit rules tested</div><div id="exitsT"></div></div>
     <details class="card"><summary style="cursor:pointer;list-style:none"><div class="row between"><div class="k">Process score per session</div><span class="soft">tap</span></div></summary><div id="scoreChart"></div><small class="soft">Gate: 95%+ for 10 sessions in a row before real money is even discussed.</small></details>
     <details class="card"><summary style="cursor:pointer;list-style:none"><div class="row between"><div class="k">Lessons learned</div><span class="soft" id="lessonsN">tap</span></div></summary><div id="lessons" class="md"></div></details>
@@ -271,7 +278,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v23";
+const VERSION="v24";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -481,8 +488,7 @@ function renderScores(){ try{ renderReview(); }catch(e){ console.error(e); }
   $("#tourWhen").textContent = L.run_at ? new Date(L.run_at).toLocaleDateString() : "";
   const rk=(L.ranking||[]), cur=(L.current||{}).avg_r_taken, tmx=Math.max(0.05,...rk.map(r=>Math.abs(r.avg_r_taken||0)),Math.abs(cur||0));
   $("#tour").innerHTML = rk.length ? rk.map((r,i)=>rbar((i===0?"🏆 ":"")+r.model,r.avg_r_taken,null,null,tmx,`Brier ${r.brier_exam?.toFixed(3)} on the final exam`)).join("")+(cur!=null?rbar("current method (in use)",cur,null,null,tmx,"what the live system does now"):"") : `<div class="empty">No tournament yet.</div>`;
-  $("#progress").innerHTML = H.length ? lineChart([{name:"best model",col:"#a78bfa",vals:H.map(h=>h.champ_r)},{name:"current method",col:"#60a5fa",vals:H.map(h=>h.current_r)}],H.map(h=>new Date(h.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})))
-     + `<small class="soft">Money per chosen trade after each daily tournament. ${H.length<3?"More points appear every day as the models retrain.":""}</small>` : `<div class="empty">The first point appears after today's tournament.</div>`;
+  try{ renderRace(H); }catch(e){ console.error(e); }
   const B=state.snap.bench||{}, BR=(B.rows||[]).filter(r=>r&&r.label); state.bt=state.bt||"weakening";
   $("#benchWhen").textContent=B.made?new Date(B.made).toLocaleDateString():"";
   const ST={weakening:["Weakening","neg"],proven:["Proven (hold-out passed)","pos"],healthy:["Active & healthy","pos"],watching:["Watching","amb"],retired:["Retired","dim"],benched:["Benched","dim"]};
@@ -735,6 +741,41 @@ function paintStrength(){ document.querySelectorAll("#medges [data-a]").forEach(
 
 /* ---------- the review queue (everything set aside for 24 December) ---------- */
 const RQK={proposal:["Proposals","📝"],bench:["Bench","🪑"],strategy:["Strategy lab","🧪"],trial:["Trials running","⏳"],model:["Models","🏆"],scout:["Scouted skills","🔭"]};
+const RACE_COL=["#a78bfa","#34d399","#fbbf24","#f472b6","#2dd4bf","#fb923c","#f87171","#94a3b8","#c084fc"];
+const RACE_LIVE="logistic regression";   // the kind of model scoring trades now (pinned during the freeze)
+function renderRace(H){
+  state.raceR=state.raceR||"all";
+  const rng={"7":"7 days","30":"30 days","all":"All"};
+  $("#raceRange").innerHTML=Object.entries(rng).map(([k,v])=>`<button class="chip ${state.raceR===k?"on":""}" onclick="state.raceR='${k}';renderScores()">${v}</button>`).join("");
+  const cut=state.raceR==="all"?0:Date.now()-(+state.raceR)*864e5;
+  const pts=(H||[]).filter(h=>h&&h.models&&new Date(h.at).getTime()>=cut);
+  if(!pts.length){$("#race").innerHTML=`<div class="empty">The first point appears after the next daily tournament.</div>`;$("#raceBoard").innerHTML="";$("#raceNote").textContent="";return;}
+  $("#raceWhen").textContent=pts.length+" tournament"+(pts.length>1?"s":"");
+  const names=[...new Set(pts.flatMap(h=>Object.keys(h.models)))];
+  const stat=names.map(n=>{const v=pts.map(h=>h.models[n]).filter(x=>x!=null);const avg=v.reduce((a,b)=>a+b,0)/(v.length||1);
+    const lead=pts.filter(h=>h.champion===n).length;return {n,last:v.at(-1),avg,lead,first:v[0],len:v.length};});
+  stat.push({n:"current method",last:pts.at(-1).current_r,avg:pts.reduce((a,h)=>a+(h.current_r||0),0)/pts.length,lead:0,first:pts[0].current_r,len:pts.length,base:true});
+  stat.sort((a,b)=>b.avg-a.avg);
+  const col={}; let ci=0; stat.forEach(s=>{col[s.n]=s.base?"#60a5fa":s.n===RACE_LIVE?"#34d399":RACE_COL.filter(c=>c!=="#34d399")[ci++%8];});
+  state.raceSel=state.raceSel&&names.concat("current method").includes(state.raceSel)?state.raceSel:null;
+  const W=320,Hh=150,all=pts.flatMap(h=>[...Object.values(h.models),h.current_r]).filter(v=>v!=null);
+  const mn=Math.min(0,...all),mx=Math.max(0,...all),sp=(mx-mn)||1,N=Math.max(2,pts.length);
+  const X=i=>pts.length===1?W/2:10+i*(W-20)/(N-1),Y=v=>Hh-16-(v-mn)/sp*(Hh-30);
+  const lineFor=(n,vals)=>{const sel=state.raceSel===n,dim=state.raceSel&&!sel,live=n===RACE_LIVE||n==="current method";
+    const p=vals.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    return `<g opacity="${dim?0.15:1}"><polyline points="${p.map(q=>q.map(x=>x.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="${col[n]}" stroke-width="${sel?3.5:live?2.6:1.6}" ${n==="current method"?'stroke-dasharray="5 4"':""} stroke-linejoin="round"/>${p.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="${sel?4:2.6}" fill="${col[n]}"/>`).join("")}</g>`;};
+  const F=(state.snap.review||{}).freeze||{}; let fz="";
+  if(F.from){const fi=pts.findIndex(h=>h.at.slice(0,10)>=F.from); if(fi>0) fz=`<line x1="${X(fi)-((X(fi)-X(fi-1))/2)}" x2="${X(fi)-((X(fi)-X(fi-1))/2)}" y1="4" y2="${Hh-14}" stroke="#7dd3fc" stroke-dasharray="2 3"/><text x="${X(fi)-((X(fi)-X(fi-1))/2)+3}" y="12" fill="#7dd3fc" font-size="9">freeze</text>`;}
+  $("#race").innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" height="${Hh}"><line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="#223043" stroke-dasharray="3 4"/>${fz}
+    ${stat.slice().reverse().map(s=>lineFor(s.n,s.base?pts.map(h=>h.current_r):pts.map(h=>h.models[s.n]))).join("")}
+    <text x="4" y="11" fill="#5d6f84" font-size="9">${mx>=0?"+":""}${mx.toFixed(2)}R</text><text x="4" y="${Y(0)-3}" fill="#5d6f84" font-size="9">0</text>
+    <text x="4" y="${Hh-2}" fill="#5d6f84" font-size="9">${new Date(pts[0].at).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</text><text x="${W-4}" y="${Hh-2}" fill="#5d6f84" font-size="9" text-anchor="end">${new Date(pts.at(-1).at).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</text></svg>`;
+  const f=v=>v==null?"—":(v>=0?"+":"")+v.toFixed(3)+"R";
+  $("#raceBoard").innerHTML=`<div class="rtab"><div class="rh"><span>#</span><span>Model</span><span>Latest</span><span>Average</span><span>Trend</span></div>`+stat.map((s,i)=>{
+    const tr=s.len>1?(s.last-s.first):null, arrow=tr==null?"·":tr>0.002?"▲":tr<-0.002?"▼":"▬";
+    return `<div class="rrow ${state.raceSel===s.n?"on":""}" onclick="state.raceSel=state.raceSel==='${s.n}'?null:'${s.n}';renderScores()"><span>${i+1}</span><span><i class="sw" style="background:${col[s.n]}"></i>${esc(s.n)}${s.n===RACE_LIVE?' <em class="pin">in use · pinned</em>':s.base?' <em class="soft">baseline</em>':""}${s.lead?` <em class="soft">🏆×${s.lead}</em>`:""}</span><span class="${(s.last??0)>=0?"pos":"neg"}">${f(s.last)}</span><span class="${s.avg>=0?"pos":"neg"}">${f(s.avg)}</span><span class="${tr==null?"soft":tr>0?"pos":"neg"}">${arrow}</span></div>`;}).join("")+`</div>`;
+  $("#raceNote").textContent="Each point is one daily tournament: money per trade each model would have chosen, on months it never saw (practice trades, not real money). Tap a model to highlight it. The green line is the kind of model scoring trades now; it stays pinned until the 24 December review, and a challenger has to lead for weeks, not days, to replace it."+(pts.length<5?" With only "+pts.length+" point"+(pts.length>1?"s":"")+" so far, it's too early to read trends; one point arrives each morning.":"");
+}
 function renderReview(){
   const Q=state.snap.review||{}, F=Q.freeze||{}, items=Q.items||[];
   const rv=F.review?new Date(F.review+"T00:00:00"):null, days=rv?Math.ceil((rv-Date.now())/864e5):null;
