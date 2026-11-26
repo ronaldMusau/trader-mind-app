@@ -66,6 +66,7 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:
 .hero2{background:linear-gradient(135deg,rgba(167,139,250,.16),rgba(96,165,250,.08));border-color:rgba(167,139,250,.35)}
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tgrid .empty,.tgrid .pager{grid-column:1/-1}.tc{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;font-size:13px}.tc svg{display:block;margin:4px 0}.tc b{white-space:nowrap}
 .inp{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 8px}
+.sug{background:var(--card2);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:13px}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px}.pager .chip[disabled]{opacity:.35}.nt{text-align:right;font-size:12px;line-height:1.2}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:flex;gap:6px;align-items:center}
@@ -110,7 +111,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v13</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v14</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -188,6 +189,9 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
     <div class="card hero2"><div class="k">How the learning is going</div><div id="lrnHead"></div></div>
     <div class="card"><div class="row between"><div class="k">Where the money comes from</div><span class="tag">2 years · replayed</span></div>
       <div id="moneyBy"></div><small class="soft">Average result per trade in R (1R = the amount risked). Green = made money, red = lost. The two dots show the older and newer year: a market only counts as a money-maker if both are green.</small></div>
+    <div class="card"><div class="row between"><div class="k">The bench: watching closely</div><span class="tag" id="benchWhen"></span></div>
+      <div id="benchSug"></div><div class="chips" id="benchTabs"></div><div id="bench"></div>
+      <small class="soft">ACTIVE = traded now. BENCH = not traded, but watched so a replacement is always ready. A swap or drop is only a suggestion: it happens after you say yes.</small></div>
     <div class="card"><div class="row between"><div class="k">Model tournament</div><span class="tag" id="tourWhen"></span></div>
       <div id="tour"></div><small class="soft">Each bar = money per trade the model would have chosen, on months it never saw. The last bar is the method in use now. A model replaces it only if it earns more and passes a final exam.</small></div>
     <div class="card"><div class="k">Model progress over time</div><div id="progress"></div></div>
@@ -229,7 +233,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v13";
+const VERSION="v14";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -441,6 +445,13 @@ function renderScores(){
   $("#tour").innerHTML = rk.length ? rk.map((r,i)=>rbar((i===0?"🏆 ":"")+r.model,r.avg_r_taken,null,null,tmx,`Brier ${r.brier_exam?.toFixed(3)} on the final exam`)).join("")+(cur!=null?rbar("current method (in use)",cur,null,null,tmx,"what the live system does now"):"") : `<div class="empty">No tournament yet.</div>`;
   $("#progress").innerHTML = H.length ? lineChart([{name:"best model",col:"#a78bfa",vals:H.map(h=>h.champ_r)},{name:"current method",col:"#60a5fa",vals:H.map(h=>h.current_r)}],H.map(h=>new Date(h.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})))
      + `<small class="soft">Money per chosen trade after each daily tournament. ${H.length<3?"More points appear every day as the models retrain.":""}</small>` : `<div class="empty">The first point appears after today's tournament.</div>`;
+  const B=state.snap.bench||{}, BR=B.rows||[]; state.bt=state.bt||"weakening";
+  $("#benchWhen").textContent=B.made?new Date(B.made).toLocaleDateString():"";
+  const ST={weakening:["Weakening","neg"],ready:["Ready on bench","pos"],healthy:["Active & healthy","pos"],watching:["Watching","amb"],benched:["Benched","dim"]};
+  $("#benchSug").innerHTML=(B.suggestions||[]).length?`<div class="k" style="margin-top:6px">Suggestions</div>`+B.suggestions.map(x=>`<div class="sug">${x.drop?`<span class="neg">Drop ${esc(x.drop)}</span> <small class="soft">${esc(x.why)}</small><br>`:""}${x.instead?`<span class="pos">${x.drop?"→ use instead: ":"+ Add: "}${esc(x.instead)}</span> <small class="soft">${esc(x.instead_why)}</small>`:`<small class="soft">${esc(x.instead_why||"")}</small>`}</div>`).join(""):"";
+  $("#benchTabs").innerHTML=Object.entries(ST).map(([k,v])=>`<button class="chip ${state.bt===k?"on":""}" onclick="state.bt='${k}';renderScores()">${v[0]} <span class="n">${(B.counts||{})[k]??0}</span></button>`).join("");
+  const bl=BR.filter(r=>r.status===state.bt), bmx=Math.max(0.2,...bl.map(r=>Math.max(Math.abs(r.older||0),Math.abs(r.newer||0),Math.abs(r.replay_all||0))));
+  $("#bench").innerHTML=bl.length?bl.map(r=>rbar((r.active?"● ":"○ ")+r.label+(r.kind==="group"?" (type+setup)":""),r.replay_all||0,r.older,r.newer,bmx,`${r.active?"ACTIVE":"BENCH"} · ${r.n} replayed trades${r.live_n?` · real ${r.live_mean_r>=0?"+":""}${r.live_mean_r}R over ${r.live_n}`:""}`)).join(""):`<div class="empty">Nothing here right now.</div>`;
   const ru=R.rules||[];
   $("#exitsT").innerHTML = ru.length ? `<table class="tbl"><tr><th>Rule</th><th>R/trade</th><th>Wins</th></tr>${ru.map((x,i)=>`<tr${i===0?' class="cur"':""}><td>${esc(x.rule)}</td><td class="${x.all.mean_r>=0?"pos":"neg"}">${x.all.mean_r>=0?"+":""}${x.all.mean_r.toFixed(3)}</td><td>${Math.round(100*x.all.win_rate)}%</td></tr>`).join("")}</table><small class="soft">${esc(R.verdict||"")}</small>` : `<div class="empty">Runs with the weekly replay.</div>`;
   setTimeout(()=>document.querySelectorAll(".rbf[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),60);
