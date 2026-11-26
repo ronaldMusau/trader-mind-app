@@ -68,6 +68,12 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:
 .inp{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 8px}
 .sug{background:var(--card2);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:13px}
 .newsl{margin-top:10px;font-size:13px;line-height:1.4}.nb{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-weight:700}.nb.up{color:var(--green);border-color:rgba(52,211,153,.5)}.nb.dn{color:var(--red);border-color:rgba(248,113,113,.5)}
+#mindSvg .ed{stroke:#223043;stroke-width:1}#mindSvg .fb{fill:none;stroke:#a78bfa;stroke-opacity:.25;stroke-width:1;stroke-dasharray:3 4}
+#mindSvg .nl{fill:#eaf0f6;font-size:9.5px;font-weight:700;text-anchor:middle}#mindSvg .ns{fill:#8fa0b3;font-size:7.5px;text-anchor:middle}#mindSvg .lay{fill:#5d6f84;font-size:8px;letter-spacing:.12em;text-transform:uppercase}
+#mindSvg .beat{animation:beat 2.4s ease-in-out infinite;transform-origin:180px 300px}@keyframes beat{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1.05)}}
+#mindSvg .fire{animation:fire 1.8s ease-in-out infinite}@keyframes fire{0%,100%{opacity:.65}50%{opacity:1}}#mindSvg .nd.sel circle:nth-of-type(1){stroke-width:4}
+.mindcard{background:radial-gradient(120% 60% at 50% 40%,rgba(167,139,250,.10),transparent 70%),var(--card)}.mleg{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--soft);margin:4px 0 6px}.mleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.dotc{width:12px;height:12px;border-radius:50%;display:inline-block}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px}.pager .chip[disabled]{opacity:.35}.nt{text-align:right;font-size:12px;line-height:1.2}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:flex;gap:6px;align-items:center}
@@ -112,7 +118,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v15</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v16</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -169,6 +175,14 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
     <div id="tlist"></div>
   </section>
 
+  <section id="v-mind" class="view hidden">
+    <div class="card mindcard"><div class="row between"><div><div class="k">Trader Mind · one brain</div><small class="soft" id="mindSub"></small></div><span class="tag" id="mindBeat">●</span></div>
+      <svg id="mindSvg" viewBox="0 0 360 700" width="100%" style="display:block;touch-action:manipulation"></svg>
+      <div class="mleg"><span><i style="background:#34d399"></i>working</span><span><i style="background:#fbbf24"></i>waiting · on trial</span><span><i style="background:#f87171"></i>needs attention</span><span><i style="background:#5d6f84"></i>idle</span></div>
+      <small class="soft">Every part is a neuron. Signals flow from the senses (prices, news, brokers) through the thinking parts into decisions and trades, and every closed trade flows back to teach the models and the bench. Tap a neuron.</small></div>
+    <div class="card" id="mindInfo"><div class="empty">Tap any neuron to see what it is doing right now.</div></div>
+  </section>
+
   <section id="v-results" class="view hidden">
     <div id="readyBox"></div>
     <div class="chips" id="rcls"></div>
@@ -208,6 +222,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <nav id="nav" class="hidden">
   <button data-v="home" class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Overview</button>
   <button data-v="ideas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>Ideas<span class="badge hidden" id="ibadge">0</span></button>
+  <button data-v="mind"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="1.8"/><circle cx="19.5" cy="6" r="1.8"/><circle cx="4.5" cy="18" r="1.8"/><circle cx="19.5" cy="18" r="1.8"/><path d="M6 7l4 3.5M18 7l-4 3.5M6 17l4-3.5M18 17l-4-3.5"/></svg>Mind</button>
   <button data-v="trades"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg>Trades<span class="badge hidden" id="badge">0</span></button>
   <button data-v="results"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Results</button>
   <button data-v="journal" class="hidden"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/></svg>Journal</button>
@@ -237,7 +252,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v15";
+const VERSION="v16";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -245,7 +260,7 @@ function showErr(e){ const b=$("#errbar"); if(b){ b.classList.remove("hidden"); 
 window.addEventListener("error",ev=>showErr(ev.error||ev.message));
 window.addEventListener("unhandledrejection",ev=>showErr(ev.reason));
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
-function show(v){state.view=v;if(v==="results")renderResults();if(v==="ideas")renderIdeas();if(v==="settings")renderSettings();renderPendingSoon();document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
+function show(v){state.view=v;if(v==="mind")renderMind();if(v==="results")renderResults();if(v==="ideas")renderIdeas();if(v==="settings")renderSettings();renderPendingSoon();document.querySelectorAll(".view").forEach(e=>e.classList.add("hidden"));$("#v-"+v).classList.remove("hidden");
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
 let lastRefresh=0;
@@ -473,6 +488,114 @@ function renderScores(){
      <div style="height:8px;background:#223043;border-radius:5px;overflow:hidden"><div style="height:100%;width:${r.v}%;background:${r.v>=95?"var(--green)":r.v>=80?"var(--amber)":"var(--red)"};border-radius:5px"></div></div></div>`).join("") : `<div class="empty">No sessions scored yet.</div>`;
   const lm=(state.snap.lessons||{}).markdown||""; $("#lessons").innerHTML = md(lm); const ln=(lm.match(/^\d+\./gm)||[]).length; $("#lessonsN").textContent = ln?ln+" lessons":"tap";
 }
+
+
+/* ---------- the Mind: the whole system as one network of neurons ---------- */
+const MIND_NODES=[
+ // senses
+ {id:"prices",x:40,y:70,r:17,label:"Prices",g:"sense"},{id:"news",x:110,y:52,r:17,label:"News",g:"sense"},{id:"calendar",x:180,y:44,r:15,label:"Calendar",g:"sense"},
+ {id:"capital",x:250,y:52,r:17,label:"Capital.com",g:"sense"},{id:"binance",x:320,y:70,r:17,label:"Binance",g:"sense"},
+ // thinking
+ {id:"study",x:48,y:190,r:18,label:"Study",g:"think"},{id:"models",x:128,y:168,r:20,label:"Models",g:"think"},
+ {id:"bench",x:232,y:168,r:18,label:"Bench",g:"think"},{id:"ready",x:312,y:190,r:17,label:"Readiness",g:"think"},
+ // core
+ {id:"core",x:180,y:300,r:36,label:"MIND",g:"core"},
+ // deciding
+ {id:"ideas",x:46,y:420,r:19,label:"Ideas",g:"decide"},{id:"risk",x:132,y:448,r:17,label:"Risk & limits",g:"decide"},
+ {id:"you",x:228,y:448,r:18,label:"You",g:"decide"},{id:"claude",x:314,y:420,r:17,label:"Supervisor",g:"decide"},
+ // acting
+ {id:"place",x:80,y:548,r:18,label:"Placing",g:"act"},{id:"watch",x:180,y:562,r:18,label:"Watcher",g:"act"},{id:"manage",x:280,y:548,r:18,label:"Manage",g:"act"},
+ // markets
+ {id:"m_forex",x:45,y:650,r:19,label:"Forex",g:"mkt",cls:"forex"},{id:"m_commodity",x:135,y:662,r:19,label:"Commodities",g:"mkt",cls:"commodity"},
+ {id:"m_stock",x:225,y:662,r:19,label:"Stocks",g:"mkt",cls:"stock"},{id:"m_crypto",x:315,y:650,r:19,label:"Crypto",g:"mkt",cls:"crypto"}];
+const MIND_EDGES=[["prices","study"],["prices","models"],["prices","ideas"],["news","ideas"],["calendar","risk"],["capital","watch"],["capital","manage"],["binance","manage"],["binance","place"],
+ ["study","models"],["models","bench"],["models","core"],["bench","core"],["ready","core"],["study","core"],["news","core"],["prices","core"],["capital","core"],["binance","core"],["calendar","core"],
+ ["core","ideas"],["core","risk"],["core","you"],["core","claude"],["ideas","risk"],["risk","place"],["you","place"],["claude","manage"],["claude","bench"],
+ ["place","m_forex"],["place","m_commodity"],["place","m_stock"],["place","m_crypto"],["watch","m_forex"],["watch","m_commodity"],["watch","m_stock"],
+ ["manage","m_forex"],["manage","m_commodity"],["manage","m_stock"],["manage","m_crypto"]];
+const MIND_FEEDBACK=[["m_forex","study"],["m_crypto","bench"],["m_commodity","models"],["m_stock","ready"]];   // results flow back and teach
+const COL={ok:"#34d399",wait:"#fbbf24",bad:"#f87171",idle:"#5d6f84"};
+function ago(iso){ if(!iso) return null; return (Date.now()-new Date(iso))/6e4; }
+function agoTxt(m){ return m==null?"never":m<1?"just now":m<60?Math.round(m)+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"; }
+function mindStatus(){
+  const S=state.snap||{}, T=state.trades||[], open=T.filter(t=>t.status==="open"&&t.mode==="demo"), wait=T.filter(t=>t.status==="proposed"&&!(t.expires_at&&new Date(t.expires_at)<=Date.now()));
+  const closed=T.filter(t=>t.status==="closed"&&t.mode==="demo"), today=new Date().toDateString(), ct=closed.filter(t=>t.closed_at&&new Date(t.closed_at).toDateString()===today);
+  const hb=ago((S.heartbeat||{}).at), rec=S.recs||{}, rag=ago(rec.created_at), N=S.news||{}, nag=ago(N.made), M=(S.models||{}).latest||{}, B=S.bench||{}, R=S.readiness||{};
+  const notes=(rec.notes||[]).join(" "), [mode,why]=(typeof modeNow==="function")?modeNow(state.settings||{}):["?",""];
+  const cnt=c=>open.filter(t=>t.asset_class===c), pl=a=>a.reduce((x,t)=>x+(+t.pnl_usd||0),0);
+  const st={};
+  st.core={c:hb==null?"idle":hb<75?"ok":"bad",t:hb==null?"No run yet":"Last thought "+agoTxt(hb),d:[`Your PC runs the whole mind every hour (last: ${agoTxt(hb)}${(S.heartbeat||{}).runner?" on "+S.heartbeat.runner:""}).`,`${open.length} trades open · ${wait.length} waiting · ${closed.length} closed so far.`,hb!=null&&hb>=75?"The hourly runs look stopped: check the PC is on.":"Healthy heartbeat."],go:"home"};
+  st.prices={c:rag==null?"idle":rag<75?"ok":"bad",t:"Read "+agoTxt(rag),d:[`Live and 2-year prices for ${(rec.ideas||[]).length||"all"} markets (Yahoo Finance), read ${agoTxt(rag)}.`],go:"ideas"};
+  const nsc=Object.values(N.scores||{}).filter(v=>v.score!=null);
+  st.news={c:nag==null?"idle":"wait",t:nag==null?"Starting":"On trial",d:[nag==null?"Your PC's local models (Qwen 3.5 and FinBERT) start reading headlines with the next hourly run.":`${nsc.length} markets scored ${agoTxt(nag)} by your PC's own models.`,"On trial: recorded on every trade, not used to decide until it proves it makes money."],go:"rules"};
+  st.calendar={c:/calendar unreachable/.test(notes)?"wait":"ok",t:/calendar unreachable/.test(notes)?"Unreachable":"Watching",d:["Big economic news (rate decisions, jobs reports) pauses new trades 30 min before and 15 min after."]};
+  const capOpen=open.filter(t=>t.asset_class!=="crypto");
+  st.capital={c:"ok",t:capOpen.length+" open",d:[`Capital.com DEMO: ${capOpen.length} open trades (forex, commodities, stocks, indices).`,"Stops and targets sit at the broker; the minute watcher protects them."],go:"trades"};
+  st.binance={c:cnt("crypto").length?"ok":"idle",t:cnt("crypto").length?cnt("crypto").length+" open":"Ready",d:["Binance TEST network (fake money): crypto buys only.","Each buy carries its stop and target at Binance (OCO), so it is protected even with the PC off."],go:"trades"};
+  const fs=S.forex_stats||{};
+  st.study={c:"ok",t:(fs.open??0)+" practising",d:["Paper-trades every signal on every market in the background (no money) so the models have more to learn from.",`${fs.open??0} practice trades open now.`]};
+  st.models={c:M.promoted?"ok":"wait",t:M.promoted?"Using "+(M.champion||""):"Current method",d:[`${M.models_tried||"Several"} models compete every day; the winner is judged on MONEY made on months it never saw.`,M.verdict||"No tournament yet."],go:"rules"};
+  const bc=B.counts||{};
+  st.bench={c:(bc.weakening||0)>0?"wait":"ok",t:`${bc.weakening||0} weak · ${bc.ready||0} ready`,d:[`Watching every market and setup: ${bc.healthy||0} healthy, ${bc.weakening||0} weakening, ${bc.ready||0} ready on the bench.`,...((B.suggestions||[]).slice(0,2).map(x=>x.drop?`Suggests dropping ${x.drop}${x.instead?" for "+x.instead:""}.`:`Suggests adding ${x.instead}.`))],go:"rules"};
+  st.ready={c:R.ready?"ok":"wait",t:R.ready?"Ready":"Not ready",d:["The gate before real money is ever discussed: 200+ closed trades, profit with a safety margin, small drawdown, honest win chances, 4+ weeks.",R.verdict?String(R.verdict):"Still collecting trades."],go:"results"};
+  st.ideas={c:wait.length?"wait":"ok",t:`${(rec.ideas||[]).length} checked · ${wait.length} waiting`,d:[`Last scan checked ${(rec.ideas||[]).length} markets; ${(rec.proposed||[]).length} became trade ideas.`,wait.length?`${wait.length} idea(s) waiting for you.`:"Nothing waiting for you."],go:"ideas"};
+  st.risk={c:"ok",t:"$4 cap",d:["Max loss $4 per trade; demo only; at most 20 open; exposure cap per currency; auto trades pause after $10 lost in a day.","Only setups that made money in the 2-year replay are placed (no breakouts; forex and stocks pullbacks only)."]};
+  st.you={c:mode==="auto"?"ok":"wait",t:"Mode: "+mode,d:[`Mode now: ${mode}${why?" ("+why+")":""}.`,"You approve trades in Manual mode and any rule change. Real money is only ever your decision."],go:"settings"};
+  st.claude={c:"ok",t:"3 checks a day",d:["Claude checks at 07:44, 12:44 and 18:44 Nairobi time: fixes problems, spots weak parts, keeps the bench full and proposes improvements for your yes."]};
+  st.place={c:open.length?"ok":"idle",t:open.length+" open",d:[`${open.length} demo trades open across all markets.`],go:"trades"};
+  st.watch={c:"ok",t:"Every minute",d:["In the cloud, every minute: moves stops to breakeven, banks fading profits, records closes even when your PC is off, and alerts you if the PC stops."]};
+  st.manage={c:ct.length?"ok":"idle",t:ct.length+" closed today",d:[`${ct.length} trades closed today (${money(pl(ct))}).`,"Hourly: time limits, trend flips, recording exits and R for learning."],go:"results"};
+  for(const c of ["forex","commodity","stock","crypto"]){ const o=cnt(c), cl=closed.filter(t=>t.asset_class===c), v=pl(cl);
+    st["m_"+c]={c:o.length?"ok":"idle",t:`${o.length} open · ${money(v)}`,d:[`${o.length} open now; ${cl.length} closed so far, total ${money(v)}.`,c==="commodity"?"The strongest market type in the 2-year replay: stakes x1.25.":c==="crypto"?"Binance test network, buys only.":"Pullback setups only (this type lost money on other setups)."],go:"results",cls:c}; }
+  return {st,open};
+}
+let mindRAF=null, pulses=[];
+function renderMind(){
+  const {st,open}=mindStatus(), svg=$("#mindSvg"), N=Object.fromEntries(MIND_NODES.map(n=>[n.id,n]));
+  $("#mindSub").textContent=st.core.t+" · "+open.length+" open trades";
+  const line=(a,b,cls)=>{const A=N[a],B=N[b];return `<line class="${cls}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;};
+  const fb=MIND_FEEDBACK.map(([a,b])=>{const A=N[a],B=N[b];const cx=a.endsWith("forex")?-10:a.endsWith("crypto")?370:(A.x+B.x)/2, cy=(A.y+B.y)/2;return `<path class="fb" d="M${A.x},${A.y} Q${cx},${cy} ${B.x},${B.y}"/>`;}).join("");
+  // open trades as small neurons around their market
+  const dots=[];["forex","commodity","stock","crypto"].forEach(c=>{const n=N["m_"+c], ts=open.filter(t=>t.asset_class===c);
+    ts.forEach((t,i)=>{const a=Math.PI*(1.15+0.7*(i/Math.max(1,ts.length-1||1))), rr=n.r+13, r=curR(t), col=r==null?"#8fa0b3":r>=0?"#34d399":"#f87171";
+      dots.push(`<g class="tn" data-t="${esc(t.id)}"><line x1="${n.x}" y1="${n.y}" x2="${n.x+rr*Math.cos(a)}" y2="${n.y+rr*Math.sin(a)}" stroke="${col}" stroke-opacity=".4"/><circle cx="${n.x+rr*Math.cos(a)}" cy="${n.y+rr*Math.sin(a)}" r="4.2" fill="${col}"><title>${esc(t.instrument)}</title></circle></g>`);});});
+  svg.innerHTML=`<defs><radialGradient id="coreG"><stop offset="0" stop-color="#a78bfa" stop-opacity=".9"/><stop offset="1" stop-color="#60a5fa" stop-opacity=".15"/></radialGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    ${["Senses","Thinking","","Deciding","Acting","Markets"].map((t,i)=>t?`<text class="lay" x="2" y="${[18,135,0,385,505,615][i]}">${t}</text>`:"").join("")}
+    <g>${MIND_EDGES.map(([a,b])=>line(a,b,"ed")).join("")}${fb}</g><g id="pulses"></g>${dots.join("")}
+    ${MIND_NODES.map(n=>{const s=st[n.id]||{c:"idle"},col=COL[s.c];return `<g class="nd" data-n="${n.id}" style="cursor:pointer">
+      ${n.id==="core"?`<circle cx="${n.x}" cy="${n.y}" r="${n.r+14}" fill="url(#coreG)" class="beat"/>`:""}
+      <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="#141d28" stroke="${col}" stroke-width="${n.id==="core"?3:2.2}" filter="url(#glow)"/>
+      <circle cx="${n.x}" cy="${n.y}" r="${Math.max(3,n.r*0.28)}" fill="${col}" class="${s.c==="ok"?"fire":""}"/>
+      <text x="${n.x}" y="${n.y+n.r+12}" class="nl">${esc(n.label)}</text>
+      <text x="${n.x}" y="${n.y+n.r+22}" class="ns">${esc((s.t||"").slice(0,22))}</text></g>`;}).join("")}`;
+  svg.querySelectorAll(".nd").forEach(g=>g.onclick=()=>mindInfo(g.dataset.n,st));
+  svg.querySelectorAll(".tn").forEach(g=>g.onclick=()=>{const t=state.trades.find(x=>x.id===g.dataset.t); if(!t) return; const r=curR(t);
+    $("#mindInfo").innerHTML=`<div class="k">Trade neuron</div>${rCard(t,true)}<small class="soft">${r!=null?`Now ${r>=0?"+":""}${r.toFixed(2)}R of the way: −1R is the stop, +1.5R the target.`:""}</small>`;});
+  state.mindSt=st; startPulses(st,N);
+}
+function mindInfo(id,st){ const n=MIND_NODES.find(x=>x.id===id), s=st[id]||{};
+  $("#mindInfo").innerHTML=`<div class="row between"><div class="row" style="gap:8px"><span class="dotc" style="background:${COL[s.c||"idle"]}"></span><b style="font-size:18px">${esc(n.label)}</b></div><span class="tag">${esc(s.t||"")}</span></div>
+   ${(s.d||[]).map(x=>`<p style="margin:8px 0 0;line-height:1.45">${esc(x)}</p>`).join("")}
+   <div class="soft" style="margin-top:8px;font-size:12px">Connected to: ${[...new Set(MIND_EDGES.concat(MIND_FEEDBACK).filter(e=>e.includes(id)).map(e=>e[0]===id?e[1]:e[0]))].map(x=>(MIND_NODES.find(m=>m.id===x)||{}).label).join(" · ")}</div>
+   ${s.go?`<button class="btn ok" style="margin-top:12px;width:100%" onclick="${s.cls?`state.rcls='${s.cls}';`:""}show('${s.go}')">Open ${esc({home:"Overview",ideas:"Ideas",trades:"Trades",results:"Results",rules:"Learning",settings:"Settings"}[s.go]||s.go)} →</button>`:""}`;
+  document.querySelectorAll("#mindSvg .nd").forEach(g=>g.classList.toggle("sel",g.dataset.n===id)); }
+function startPulses(st,N){
+  if(mindRAF) cancelAnimationFrame(mindRAF); pulses=[]; const g=$("#pulses"); if(!g) return;
+  const all=MIND_EDGES.map(e=>({e,fb:false})).concat(MIND_FEEDBACK.map(e=>({e,fb:true})));
+  const live=all.filter(({e})=>(st[e[0]]||{}).c!=="idle"); let last=performance.now();
+  const tick=now=>{ if(state.view!=="mind"||document.hidden){ mindRAF=null; return; }
+    const dt=Math.min(64,now-last); last=now;
+    if(live.length&&Math.random()<dt/90){ const p=live[Math.floor(Math.random()*live.length)]; pulses.push({p,t:0,sp:0.00045+Math.random()*0.0004}); }
+    pulses.forEach(q=>q.t+=q.sp*dt); pulses=pulses.filter(q=>q.t<1);
+    g.innerHTML=pulses.map(({p,t})=>{const A=N[p.e[0]],B=N[p.e[1]]; let x,y;
+      if(p.fb){const cx=p.e[0].endsWith("forex")?-10:p.e[0].endsWith("crypto")?370:(A.x+B.x)/2, cy=(A.y+B.y)/2; x=(1-t)*(1-t)*A.x+2*(1-t)*t*cx+t*t*B.x; y=(1-t)*(1-t)*A.y+2*(1-t)*t*cy+t*t*B.y;}
+      else{x=A.x+(B.x-A.x)*t; y=A.y+(B.y-A.y)*t;}
+      const c=p.fb?"#a78bfa":COL[(st[p.e[0]]||{}).c]||"#60a5fa"; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${p.fb?2.6:2.2}" fill="${c}" opacity="${(1-Math.abs(0.5-t)*1.2).toFixed(2)}"/>`;}).join("");
+    mindRAF=requestAnimationFrame(tick); };
+  mindRAF=requestAnimationFrame(tick);
+}
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&state.view==="mind") renderMind(); });
 
 /* ---------- results ---------- */
 function renderReady(){
@@ -740,7 +863,7 @@ async function load(){
   state.trades=tr.data; state.journal=jr.data||[]; state.snap=Object.fromEntries((sn.data||[]).map(r=>[r.key,r.data]));
   state.approvals=Object.fromEntries((ap.data||[]).map(r=>[r.trade_id,r]));
   pollLive();
-  for(const f of [renderPending, renderHome, renderTrades, renderResults, renderJournal, renderScores, ()=>notifyNew(tr.data)]){
+  for(const f of [renderPending, renderHome, renderTrades, renderResults, renderJournal, renderScores, ()=>{ if(state.view==="mind") renderMind(); }, ()=>notifyNew(tr.data)]){
     try{ f(); }catch(e){ console.error(e); showErr(e); } }
   $("#updated").textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
   deepLink();
