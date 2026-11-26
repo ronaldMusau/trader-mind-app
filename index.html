@@ -76,6 +76,8 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:
 #mindSvg .fire{animation:fire 1.8s ease-in-out infinite}@keyframes fire{0%,100%{opacity:.65}50%{opacity:1}}#mindSvg .nd.sel circle:nth-of-type(1){stroke-width:4}
 .mindcard{background:radial-gradient(120% 60% at 50% 40%,rgba(167,139,250,.10),transparent 70%),var(--card)}.mleg{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--soft);margin:4px 0 6px}.mleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
 .dotc{width:12px;height:12px;border-radius:50%;display:inline-block}
+.fzcard{border-color:rgba(96,165,250,.45);background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(167,139,250,.06))}.fzbar{height:8px;background:#1a2433;border-radius:6px;overflow:hidden;margin:8px 0 4px}.fzbar div{height:100%;background:linear-gradient(90deg,#60a5fa,#a78bfa);border-radius:6px}
+.fzmini{cursor:pointer;font-size:13px;border-color:rgba(96,165,250,.4)}.rqi{border-bottom:1px solid var(--line);padding:8px 0}.rqi summary{display:flex;gap:8px;align-items:center;cursor:pointer;list-style:none}.rqi summary b{flex:1;font-size:13.5px}.rqi small{display:block;margin-top:6px;line-height:1.45}.tag.pos{color:var(--green)}.tag.neg{color:var(--red)}.tag.amb{color:var(--amber)}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px}.pager .chip[disabled]{opacity:.35}.nt{text-align:right;font-size:12px;line-height:1.2}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:flex;gap:6px;align-items:center}
@@ -120,7 +122,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v22</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v23</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -139,6 +141,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
   <section id="v-home" class="view hidden">
     <div class="card" id="hero"><div class="shimmer"></div><div class="shimmer" style="width:60%"></div></div>
     <div class="card hidden" id="liveAcct"></div>
+    <div class="card fzmini hidden" id="fzMini" onclick="show('rules')"></div>
     <div class="grid2" id="gauges"></div>
     <div class="grid2" id="classes" style="margin-top:12px"></div>
     <div id="openList"></div>
@@ -210,6 +213,9 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
   <section id="v-journal" class="view hidden"><div id="jlist" class="tl"></div></section>
 
   <section id="v-rules" class="view hidden">
+    <div class="card fzcard"><div class="row between"><div class="k">Waiting for the 24 December review</div><span class="tag" id="fzDays"></span></div>
+      <div id="fzProg"></div><div class="chips" id="rqTabs"></div><div id="rq"></div>
+      <small class="soft">The trading rules are frozen until the review so the trades made now are a clean test. Everything here is set aside, not lost: proposals waiting for your decision, candidates proven or promising on the bench and in the strategy lab, trials still collecting evidence, the model challenger and scouted skills. You decide on 24 December.</small></div>
     <div class="card hero2"><div class="k">How the learning is going</div><div id="lrnHead"></div></div>
     <div class="card"><div class="row between"><div class="k">Where the money comes from</div><span class="tag">2 years · replayed</span></div>
       <div id="moneyBy"></div><small class="soft">Average result per trade in R (1R = the amount risked). Green = made money, red = lost. The two dots show the older and newer year: a market only counts as a money-maker if both are green.</small></div>
@@ -265,7 +271,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v22";
+const VERSION="v23";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -460,7 +466,7 @@ function lineChart(series,labels){ // series: [{name,col,vals}]
    ${series.map(s=>{const pts=s.vals.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);return `<polyline points="${pts.map(p=>p.map(x=>x.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="${s.col}" stroke-width="2.5" stroke-linejoin="round"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${s.col}"/>`).join("")}).join("")}
    <text x="4" y="11" fill="#5d6f84" font-size="9">${(mx).toFixed(2)}R</text><text x="4" y="${H-2}" fill="#5d6f84" font-size="9">${labels[0]||""}</text><text x="${W-4}" y="${H-2}" fill="#5d6f84" font-size="9" text-anchor="end">${labels.at(-1)||""}</text></svg>
    <div class="row" style="gap:12px;flex-wrap:wrap">${series.map(s=>`<small><i class="sw" style="background:${s.col}"></i>${esc(s.name)}</small>`).join("")}</div>`;}
-function renderScores(){
+function renderScores(){ try{ renderReview(); }catch(e){ console.error(e); }
   const M=state.snap.models||{}, L=M.latest||{}, H=M.history||[], R=state.snap.replay||{}, rd=state.snap.readiness||{};
   const closed=state.trades.filter(t=>t.status==="closed"&&t.mode==="demo"), tot=closed.reduce((a,t)=>a+(+t.pnl_usd||0),0);
   const ev=(H.at(-1)||{}).events;
@@ -725,6 +731,25 @@ function paintStrength(){ document.querySelectorAll("#medges [data-a]").forEach(
   if(v==null){ el.style.strokeWidth=""; el.style.stroke=""; return; }
   const k=Math.max(-1,Math.min(1,v/0.2)); el.style.strokeWidth=(1+Math.abs(k)*2.4).toFixed(2); el.style.stroke=k>=0?`rgba(52,211,153,${0.25+0.5*Math.abs(k)})`:`rgba(248,113,113,${0.25+0.5*Math.abs(k)})`;
   el.setAttribute("data-s",v.toFixed(3)); }); }
+
+
+/* ---------- the review queue (everything set aside for 24 December) ---------- */
+const RQK={proposal:["Proposals","📝"],bench:["Bench","🪑"],strategy:["Strategy lab","🧪"],trial:["Trials running","⏳"],model:["Models","🏆"],scout:["Scouted skills","🔭"]};
+function renderReview(){
+  const Q=state.snap.review||{}, F=Q.freeze||{}, items=Q.items||[];
+  const rv=F.review?new Date(F.review+"T00:00:00"):null, days=rv?Math.ceil((rv-Date.now())/864e5):null;
+  const started=F.from?new Date(F.from+"T00:00:00")<=new Date():false;
+  const n=F.trades||0, tgt=F.target_trades||300, pct=Math.min(100,Math.round(100*n/tgt));
+  $("#fzDays").textContent=days!=null?(days>0?days+" days to go":"review due"):"";
+  $("#fzProg").innerHTML=`<div class="stats3"><div><b>${n}</b><small>trades under the frozen rules</small></div><div><b class="${(F.mean_r??0)>=0?"pos":"neg"}">${F.mean_r!=null?(F.mean_r>=0?"+":"")+F.mean_r+"R":"—"}</b><small>money per trade</small></div><div><b class="${(F.usd??0)>=0?"pos":"neg"}">${money(F.usd||0)}</b><small>result so far</small></div></div>
+    <div class="fzbar"><div style="width:${pct}%"></div></div><small class="soft">${started?`${n} of about ${tgt} trades needed to judge the rules (${pct}%)`:`The freeze starts on ${F.from||"27 Nov"}`}${F.pf!=null?` · profit factor ${F.pf}`:""}${Object.keys(F.by_type||{}).length?" · "+Object.entries(F.by_type).map(([k,v])=>`${k} ${v.n} (${v.r>=0?"+":""}${v.r}R)`).join(", "):""}</small>`;
+  const cnt=k=>items.filter(i=>i.kind===k).length; state.rqk=state.rqk||"all";
+  $("#rqTabs").innerHTML=`<button class="chip ${state.rqk==="all"?"on":""}" onclick="state.rqk='all';renderReview()">All <span class="n">${items.length}</span></button>`+Object.entries(RQK).filter(([k])=>cnt(k)).map(([k,[t]])=>`<button class="chip ${state.rqk===k?"on":""}" onclick="state.rqk='${k}';renderReview()">${t} <span class="n">${cnt(k)}</span></button>`).join("");
+  const L=items.filter(i=>state.rqk==="all"||i.kind===state.rqk);
+  const stc=st=>/PASS|proven|PASSED/i.test(st)?"pos":/FAIL|retired/i.test(st)?"neg":"amb";
+  $("#rq").innerHTML=L.length?L.map(i=>`<details class="rqi"><summary><span>${(RQK[i.kind]||["","•"])[1]}</span><b>${esc(i.title)}</b><span class="tag ${stc(i.status)}">${esc(i.status)}</span></summary><small class="soft">${esc(i.detail||"")}${i.date?" · "+esc(i.date):""}</small></details>`).join(""):`<div class="empty">Nothing set aside yet.</div>`;
+  const m=$("#fzMini"); if(m){ if(F.from){ m.classList.remove("hidden"); m.innerHTML=`<div class="row between"><span>🧊 <b>Rules frozen</b> · ${n} trades so far${F.mean_r!=null?" · "+(F.mean_r>=0?"+":"")+F.mean_r+"R/trade":""}</span><span class="soft">${days!=null&&days>0?days+" days to review":"review due"} · ${items.length} waiting ›</span></div><div class="fzbar"><div style="width:${pct}%"></div></div>`; } }
+}
 
 /* ---------- results ---------- */
 function renderReady(){
