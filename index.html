@@ -70,7 +70,8 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:
 .newsl{margin-top:10px;font-size:13px;line-height:1.4}.nb{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-weight:700}.nb.up{color:var(--green);border-color:rgba(52,211,153,.5)}.nb.dn{color:var(--red);border-color:rgba(248,113,113,.5)}
 #mindSvg .ed{stroke:#223043;stroke-width:1}#mindSvg .fb{fill:none;stroke:#a78bfa;stroke-opacity:.25;stroke-width:1;stroke-dasharray:3 4}
 #mindSvg .nl{fill:#eaf0f6;font-size:9px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#121a24;stroke-width:3.2px;stroke-linejoin:round}#mindSvg .ns{fill:#9fb0c3;font-size:7.2px;text-anchor:middle;paint-order:stroke;stroke:#121a24;stroke-width:3px;stroke-linejoin:round}
-#mindSvg .ed.hl{stroke:#a78bfa;stroke-opacity:.9;stroke-width:1.8}#mindSvg .fb.hl{stroke-opacity:.9;stroke-width:1.8}#mindSvg .nd{transition:opacity .25s}#mindSvg .nd.dim{opacity:.28}#mindSvg .lay{fill:#5d6f84;font-size:8px;letter-spacing:.12em;text-transform:uppercase}
+#mindSvg .ed.hl{stroke:#a78bfa;stroke-opacity:.9;stroke-width:1.8}#mindSvg .fb.hl{stroke-opacity:.9;stroke-width:1.8}#mindSvg .nd{transition:opacity .25s}#mindSvg .nd.flash circle:nth-of-type(1){stroke:#fff;stroke-width:4.5}#mindSvg .nd.flash{filter:drop-shadow(0 0 6px #fff)}
+.evlog{max-height:260px;overflow:auto;margin-top:6px}.evr{display:flex;gap:8px;align-items:baseline;padding:6px 2px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}.evd{width:8px;height:8px;border-radius:50%;flex:none;transform:translateY(-1px)}.evt{color:var(--soft);font-size:11px;flex:none;min-width:70px}#mindSvg .nd.dim{opacity:.28}#mindSvg .lay{fill:#5d6f84;font-size:8px;letter-spacing:.12em;text-transform:uppercase}
 #mindSvg .beat{animation:beat 2.4s ease-in-out infinite;transform-origin:180px 445px}@keyframes beat{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1.05)}}
 #mindSvg .fire{animation:fire 1.8s ease-in-out infinite}@keyframes fire{0%,100%{opacity:.65}50%{opacity:1}}#mindSvg .nd.sel circle:nth-of-type(1){stroke-width:4}
 .mindcard{background:radial-gradient(120% 60% at 50% 40%,rgba(167,139,250,.10),transparent 70%),var(--card)}.mleg{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--soft);margin:4px 0 6px}.mleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
@@ -119,7 +120,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v17</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v18</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -182,6 +183,13 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
       <div class="mleg"><span><i style="background:#34d399"></i>working</span><span><i style="background:#fbbf24"></i>waiting · on trial</span><span><i style="background:#f87171"></i>needs attention</span><span><i style="background:#5d6f84"></i>idle</span></div>
       <small class="soft">Every part is a neuron: all 16 trading skills, the scheduled checks and you. Signals flow from the senses (prices, news, brokers, insiders, regime) through the thinking parts into decisions and trades, and every closed trade flows back to teach the models and the bench. Tap a neuron.</small></div>
     <div class="card" id="mindInfo"><div class="empty">Tap any neuron to see what it is doing right now.</div></div>
+    <div class="card"><div class="row between"><div class="k">Replay a day</div><span class="tag" id="rpClock">--:--</span></div>
+      <div class="chips" id="rpDays"></div>
+      <div class="row" style="gap:10px;align-items:center"><button class="btn ok" id="rpPlay" style="padding:8px 14px;font-size:14px">▶ Play</button>
+        <input type="range" id="rpSlider" min="0" max="1440" value="0" style="flex:1"></div>
+      <div class="chips" id="rpSpeed"></div>
+      <div id="rpLog" class="evlog"></div></div>
+    <div class="card"><div class="row between"><div class="k">Recent signals</div><small class="soft">tap one to send it through the Mind</small></div><div id="evList" class="evlog"></div></div>
   </section>
 
   <section id="v-results" class="view hidden">
@@ -253,7 +261,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v17";
+const VERSION="v18";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -593,19 +601,21 @@ function renderMind(){
   svg.innerHTML=`<defs><radialGradient id="coreG"><stop offset="0" stop-color="#a78bfa" stop-opacity=".9"/><stop offset="1" stop-color="#60a5fa" stop-opacity=".15"/></radialGradient>
     <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
     ${[["Senses",24],["Thinking",205],["Deciding",515],["Acting",700],["Markets",828]].map(([t,y])=>`<text class="lay" x="2" y="${y}">${t}</text>`).join("")}
-    <g id="medges">${MIND_EDGES.map(([a,b])=>line(a,b,"ed")).join("")}${fb}</g><g id="pulses"></g>${dots.join("")}
+    <g id="medges">${MIND_EDGES.map(([a,b])=>line(a,b,"ed")).join("")}${fb}</g><g id="pulses"></g><g id="evp"></g>${dots.join("")}
     ${MIND_NODES.map(n=>{const s=st[n.id]||{c:"idle"},col=COL[s.c];return `<g class="nd" data-n="${n.id}" style="cursor:pointer">
       ${n.id==="core"?`<circle cx="${n.x}" cy="${n.y}" r="${n.r+14}" fill="url(#coreG)" class="beat"/>`:""}
       <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="#141d28" stroke="${col}" stroke-width="${n.id==="core"?3:2.2}" filter="url(#glow)"/>
       <circle cx="${n.x}" cy="${n.y}" r="${Math.max(3,n.r*0.28)}" fill="${col}" class="${s.c==="ok"?"fire":""}"/>
       <text x="${n.x}" y="${n.y+n.r+12}" class="nl">${esc(n.label)}</text>
       <text x="${n.x}" y="${n.y+n.r+21}" class="ns">${esc((s.t||"").slice(0,n.id==="core"?30:24))}</text></g>`;}).join("")}
-    <g class="tapbg"></g>`;
+    <g id="mcap" style="pointer-events:none"></g>`;
   svg.onclick=e=>{ if(e.target===svg){ document.querySelectorAll("#mindSvg .nd").forEach(g=>g.classList.remove("dim","sel")); document.querySelectorAll("#medges [data-a]").forEach(x=>x.classList.remove("hl")); } };
   svg.querySelectorAll(".nd").forEach(g=>g.onclick=()=>mindInfo(g.dataset.n,st));
   svg.querySelectorAll(".tn").forEach(g=>g.onclick=()=>{const t=state.trades.find(x=>x.id===g.dataset.t); if(!t) return; const r=curR(t);
     $("#mindInfo").innerHTML=`<div class="k">Trade neuron</div>${rCard(t,true)}<small class="soft">${r!=null?`Now ${r>=0?"+":""}${r.toFixed(2)}R of the way: −1R is the stop, +1.5R the target.`:""}</small>`;});
-  state.mindSt=st; startPulses(st,N);
+  state.mindSt=st; paintStrength(); renderEvList(); bindReplay(); renderReplayUI();
+  if(!state.mindOpened){ state.mindOpened=true; newEventsOnOpen(); }
+  startPulses(st,N);
 }
 function mindInfo(id,st){ const n=MIND_NODES.find(x=>x.id===id), s=st[id]||{};
   $("#mindInfo").innerHTML=`<div class="row between"><div class="row" style="gap:8px"><span class="dotc" style="background:${COL[s.c||"idle"]}"></span><b style="font-size:18px">${esc(n.label)}</b></div><span class="tag">${esc(s.t||"")}</span></div>
@@ -622,7 +632,14 @@ function startPulses(st,N){
   const live=all.filter(({e})=>(st[e[0]]||{}).c!=="idle"); let last=performance.now();
   const tick=now=>{ if(state.view!=="mind"||document.hidden){ mindRAF=null; return; }
     const dt=Math.min(64,now-last); last=now;
-    if(live.length&&Math.random()<dt/90){ const p=live[Math.floor(Math.random()*live.length)]; pulses.push({p,t:0,sp:0.00045+Math.random()*0.0004}); }
+    rpAdvance(dt);
+    const eg=$("#evp"); if(eg){ evPulses.forEach(q=>{ q.t+=dt/520; if(q.t>=1){ q.hop++; q.t=0; flash(q.e.p[q.hop]); } });
+      evPulses=evPulses.filter(q=>q.hop<q.e.p.length-1);
+      eg.innerHTML=evPulses.map(q=>{const A=N[q.e.p[q.hop]],B=N[q.e.p[q.hop+1]]; if(!A||!B) return ""; const x=A.x+(B.x-A.x)*q.t,y=A.y+(B.y-A.y)*q.t;
+        return `<line x1="${A.x}" y1="${A.y}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${q.col}" stroke-width="2.4" stroke-opacity=".75"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${q.col}" filter="url(#glow)"/>`;}).join(""); }
+    const cg=$("#mcap"); if(cg){ if(mindCaption&&now<mindCaption.until){ const w=Math.min(340,mindCaption.txt.length*5.6+20);
+        cg.innerHTML=`<rect x="${180-w/2}" y="0" width="${w}" height="20" rx="10" fill="#0b1016" stroke="${mindCaption.col}" stroke-opacity=".7"/><text x="180" y="13.5" text-anchor="middle" fill="${mindCaption.col}" font-size="9.5" font-weight="700">${esc(mindCaption.txt.slice(0,62))}</text>`; } else cg.innerHTML=""; }
+    if(live.length&&Math.random()<dt/160){ const p=live[Math.floor(Math.random()*live.length)]; pulses.push({p,t:0,sp:0.00045+Math.random()*0.0004}); }
     pulses.forEach(q=>q.t+=q.sp*dt); pulses=pulses.filter(q=>q.t<1);
     g.innerHTML=pulses.map(({p,t})=>{const A=N[p.e[0]],B=N[p.e[1]]; let x,y;
       if(p.fb){const cx=p.e[0].endsWith("forex")?-14:p.e[0].endsWith("crypto")?374:(A.x+B.x)/2, cy=(A.y+B.y)/2; x=(1-t)*(1-t)*A.x+2*(1-t)*t*cx+t*t*B.x; y=(1-t)*(1-t)*A.y+2*(1-t)*t*cy+t*t*B.y;}
@@ -632,6 +649,55 @@ function startPulses(st,N){
   mindRAF=requestAnimationFrame(tick);
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&state.view==="mind") renderMind(); });
+
+
+/* ---------- real events, day replay, neuron strength ---------- */
+const EVC={placed:"#34d399",idea:"#fbbf24",watch:"#60a5fa",learn:"#a78bfa",news:"#fbbf24",models:"#a78bfa",scan:"#2dd4bf",check:"#eaf0f6"};
+const EVI={placed:"⬆",closed:"✓",idea:"💡",watch:"🛡",learn:"🧠",news:"📰",models:"🏆",scan:"🔎",check:"🩺"};
+function evColor(e){ if(e.k==="closed"){ const m=/\$([+-]?[\d.]+)/.exec(e.l); return m&&+m[1]<0?"#f87171":"#34d399"; } return EVC[e.k]||"#60a5fa"; }
+let evPulses=[], mindCaption=null;
+function fireEvent(e){ if(!e||!e.p||e.p.length<2) return; evPulses.push({e,hop:0,t:0,col:evColor(e)}); mindCaption={txt:(EVI[e.k]||"●")+" "+e.l,col:evColor(e),until:performance.now()+2600+e.p.length*520}; }
+function flash(id){ const g=document.querySelector(`#mindSvg .nd[data-n="${id}"]`); if(!g) return; g.classList.remove("flash"); void g.getBBox(); g.classList.add("flash"); setTimeout(()=>g.classList.remove("flash"),700); }
+function allEvents(){ return ((state.snap.events||{}).events)||[]; }
+function newEventsOnOpen(){ let seen=null; try{ seen=localStorage.getItem("tm_seen_ev"); }catch(e){}
+  const ev=allEvents(); const fresh=ev.filter(e=>!seen||e.t>seen).slice(-6);
+  fresh.forEach((e,i)=>setTimeout(()=>fireEvent(e),400+i*1300));
+  if(ev.length){ try{ localStorage.setItem("tm_seen_ev",ev[ev.length-1].t); }catch(e){} } }
+function renderEvList(){ const ev=allEvents().slice(-25).reverse();
+  $("#evList").innerHTML=ev.length?ev.map((e,i)=>`<div class="evr" onclick="fireEvent(allEvents()[${allEvents().length-1-i}])"><span class="evd" style="background:${evColor(e)}"></span><span class="evt">${new Date(e.t).toLocaleString([], {weekday:"short",hour:"2-digit",minute:"2-digit"})}</span><span>${EVI[e.k]||""} ${esc(e.l)}</span></div>`).join(""):`<div class="empty">Signals appear after the next hourly run.</div>`; }
+// replay
+state.rp=state.rp||{day:0,clock:0,playing:false,speed:1800};
+function rpBounds(){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-state.rp.day); return [d.getTime(), d.getTime()+864e5]; }
+function renderReplayUI(){ const days=["Today","Yesterday","2 days ago"];
+  $("#rpDays").innerHTML=days.map((d,i)=>`<button class="chip ${state.rp.day===i?"on":""}" onclick="state.rp.day=${i};state.rp.clock=0;state.rp.playing=false;$('#rpLog').innerHTML='';renderReplayUI()">${d} <span class="n">${rpCount(i)}</span></button>`).join("");
+  $("#rpSpeed").innerHTML=[[900,"slow"],[1800,"normal"],[4800,"fast"]].map(([v,t])=>`<button class="chip ${state.rp.speed===v?"on":""}" onclick="state.rp.speed=${v};renderReplayUI()">${t}</button>`).join("");
+  $("#rpPlay").textContent=state.rp.playing?"❚❚ Pause":"▶ Play"; $("#rpSlider").value=Math.round(state.rp.clock/6e4); rpPaintClock(); }
+function rpCount(i){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i); const a=d.getTime(); return allEvents().filter(e=>{const t=+new Date(e.t);return t>=a&&t<a+864e5;}).length; }
+function rpPaintClock(){ const [a]=rpBounds(); $("#rpClock").textContent=new Date(a+state.rp.clock).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
+function rpAdvance(dt){ if(!state.rp.playing) return; const [a,b]=rpBounds(), before=a+state.rp.clock;
+  state.rp.clock=Math.min(864e5,state.rp.clock+dt*state.rp.speed); const after=a+state.rp.clock;
+  allEvents().filter(e=>{const t=+new Date(e.t);return t>before&&t<=after;}).forEach(e=>{ fireEvent(e);
+    $("#rpLog").insertAdjacentHTML("afterbegin",`<div class="evr"><span class="evd" style="background:${evColor(e)}"></span><span class="evt">${new Date(e.t).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</span><span>${EVI[e.k]||""} ${esc(e.l)}</span></div>`); });
+  $("#rpSlider").value=Math.round(state.rp.clock/6e4); rpPaintClock();
+  if(state.rp.clock>=864e5||after>Date.now()){ state.rp.playing=false; renderReplayUI(); } }
+function bindReplay(){ if($("#rpPlay").dataset.b) return; $("#rpPlay").dataset.b=1;
+  $("#rpPlay").onclick=()=>{ if(state.rp.clock>=864e5) state.rp.clock=0; state.rp.playing=!state.rp.playing; if(state.rp.playing&&!state.rp.clock) $("#rpLog").innerHTML=""; renderReplayUI(); };
+  $("#rpSlider").oninput=e=>{ state.rp.clock=+e.target.value*6e4; rpPaintClock(); }; }
+// neuron strength: thickness and colour of connections follow the money each part has made
+function edgeStrength(a,b){
+  const S=state.snap||{}, R=(S.replay||{}).by_class||{}, T=state.trades||[];
+  const mk=[a,b].find(x=>x.startsWith("m_"));
+  if(mk){ const c=mk.slice(2), cl=T.filter(t=>t.status==="closed"&&t.mode==="demo"&&t.asset_class===c&&t.r!=null);
+    const v=cl.length>=5?cl.reduce((x,t)=>x+ +t.r,0)/cl.length:((R[c]||{}).all||{}).mean_r; return v==null?null:v; }
+  const H=(S.models||{}).history||[]; const h=H[H.length-1]||{};
+  if((a==="models"&&b==="core")||(a==="study"&&b==="models")) return h.champ_r!=null?h.champ_r:null;
+  if(a==="bench"&&b==="core"){ const c=(S.bench||{}).counts||{}; const tot=(c.healthy||0)+(c.weakening||0); return tot?((c.healthy||0)/tot-0.5)*0.4:null; }
+  if(a==="news"){ const E=((S.news||{}).eval)||{}; return E.agree&&E.against&&E.agree[1]!=null&&E.against[1]!=null?(E.agree[1]-E.against[1]):null; }
+  return null; }
+function paintStrength(){ document.querySelectorAll("#medges [data-a]").forEach(el=>{ const v=edgeStrength(el.dataset.a,el.dataset.b);
+  if(v==null){ el.style.strokeWidth=""; el.style.stroke=""; return; }
+  const k=Math.max(-1,Math.min(1,v/0.2)); el.style.strokeWidth=(1+Math.abs(k)*2.4).toFixed(2); el.style.stroke=k>=0?`rgba(52,211,153,${0.25+0.5*Math.abs(k)})`:`rgba(248,113,113,${0.25+0.5*Math.abs(k)})`;
+  el.setAttribute("data-s",v.toFixed(3)); }); }
 
 /* ---------- results ---------- */
 function renderReady(){
