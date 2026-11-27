@@ -128,7 +128,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v26</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v27</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -283,7 +283,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v26";
+const VERSION="v27";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -405,9 +405,10 @@ function tradeCard(t){
 }
 
 function renderHome(){
-  const closed=state.trades.filter(t=>t.status==="closed").sort((a,b)=>new Date(a.closed_at)-new Date(b.closed_at));
+  const money_=state.trades.filter(t=>t.mode==="demo");    // real demo-account trades only; study trades (no money) are left out
+  const closed=money_.filter(t=>t.status==="closed").sort((a,b)=>new Date(a.closed_at)-new Date(b.closed_at));
   let cum=0; const curve=closed.map(t=>cum+=+(t.pnl_usd||0));
-  const open=state.trades.filter(t=>t.status==="open"), upl=open.reduce((s,t)=>s+(+t.upl_usd||0),0);
+  const open=money_.filter(t=>t.status==="open"), upl=open.reduce((s,t)=>s+(+t.upl_usd||0),0);
   const wins=closed.filter(t=>t.result==="win").length;
   $("#hero").innerHTML=`<div class="row between"><div class="k">Total result (closed trades)</div><span class="tag">${closed.length} closed · ${open.length} open</span></div>
     <div class="big ${cum>=0?"pos":"neg"}" id="pl">$0.00</div>
@@ -416,10 +417,12 @@ function renderHome(){
   countUp($("#pl"),cum);
   const r=state.snap.regime||{}, c=r.crypto||{};
   const post={allow:["ALLOW new trades","pos"],reduce:["REDUCE size","amb"],cash:["CASH only","neg"]}[r.posture]||["not checked","dim"];
+  const rAge=r.created_at?(Date.now()-new Date(r.created_at))/36e5:null;
+  if(rAge!=null&&rAge>8){post[0]+=` · ${rAge>48?Math.round(rAge/24)+" days":Math.round(rAge)+" h"} old`;post[1]="dim";}
   $("#gauges").innerHTML = gauge(r.component_scores?.uptrend_score ?? null, "Stock market", post[0], post[1], "s")
                          + gauge(c.score ?? null, "Crypto market", (c.zone||"not checked").replace("_"," "), c.score>=60?"pos":c.score>=40?"amb":"neg", "c");
   requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll(".needle").forEach(n=>n.style.transform=`rotate(${n.dataset.deg}deg)`),50));
-  const by={}; state.trades.forEach(t=>{const b=by[t.asset_class]||(by[t.asset_class]={c:0,o:0,w:0,p:0});if(t.status==="closed"){b.c++;b.p+=+(t.pnl_usd||0);if(t.result==="win")b.w++;}if(t.status==="open")b.o++;});
+  const by={}; money_.forEach(t=>{const b=by[t.asset_class]||(by[t.asset_class]={c:0,o:0,w:0,p:0});if(t.status==="closed"){b.c++;b.p+=+(t.pnl_usd||0);if(t.result==="win")b.w++;}if(t.status==="open")b.o++;});
   const COL={stock:"#60a5fa",forex:"#34d399",commodity:"#f5c451",crypto:"#a78bfa"};
   $("#classes").innerHTML=["forex","commodity","stock","crypto"].map(k=>{const b=by[k]||{c:0,o:0,w:0,p:0};const wr=b.c?Math.round(100*b.w/b.c):null;
     return `<div class="card" onclick="state.cls='${k}';state.st='open';show('trades');renderTrades()" style="cursor:pointer"><div class="row between"><div class="ico ${k}">${ICON[k]}</div>${ring(wr,COL[k])}</div>
