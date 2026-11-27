@@ -128,7 +128,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v28</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v29</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -286,7 +286,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v28";
+const VERSION="v29";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -550,8 +550,9 @@ const MIND_NODES=[
  {id:"bench",x:225,y:240,r:17,label:"Bench",g:"think"},{id:"ready",x:315,y:250,r:16,label:"Readiness",g:"think"},
  {id:"scanner",x:40,y:330,r:14,label:"Scanner",g:"think"},{id:"entry",x:110,y:338,r:14,label:"Entry",g:"think"},
  {id:"exit",x:180,y:342,r:14,label:"Exit plan",g:"think"},{id:"tm",x:250,y:338,r:14,label:"Time machine",g:"think"},{id:"agents",x:320,y:330,r:14,label:"AI agents",g:"think"},
- {id:"lab",x:55,y:418,r:15,label:"Strategy lab",g:"think"},{id:"holdout",x:135,y:425,r:15,label:"Hold-out",g:"think"},
- {id:"drift",x:225,y:425,r:15,label:"Drift check",g:"think"},{id:"dataset",x:305,y:418,r:15,label:"Dataset",g:"think"},
+ {id:"lab",x:40,y:418,r:15,label:"Strategy lab",g:"think"},{id:"holdout",x:110,y:428,r:15,label:"Hold-out",g:"think"},
+ {id:"shadow",x:180,y:432,r:16,label:"Followed ideas",g:"think"},
+ {id:"drift",x:250,y:428,r:15,label:"Drift check",g:"think"},{id:"dataset",x:320,y:418,r:15,label:"Dataset",g:"think"},
  // core
  {id:"core",x:180,y:515,r:34,label:"MIND",g:"core"},
  // deciding
@@ -569,7 +570,7 @@ const MIND_EDGES=[["prices","study"],["prices","models"],["prices","ideas"],["pr
  ["regime","risk"],["regime","core"],["insider","core"],["congress","core"],["earnings","core"],["insider","scanner"],["earnings","scanner"],["dataguard","ideas"],["dataguard","core"],["prices","dataguard"],
  ["study","models"],["models","bench"],["models","core"],["bench","core"],["ready","core"],["study","core"],["prices","core"],["capital","core"],["binance","core"],["calendar","core"],
  ["scanner","entry"],["entry","exit"],["exit","tm"],["tm","core"],["agents","core"],
- ["lab","bench"],["lab","core"],["holdout","lab"],["holdout","bench"],["drift","core"],["manage","drift"],["core","dataset"],["dataset","models"],
+ ["lab","bench"],["lab","core"],["holdout","lab"],["holdout","bench"],["drift","core"],["manage","drift"],["core","dataset"],["dataset","models"],["ideas","shadow"],["prices","shadow"],["shadow","models"],["shadow","bench"],
  ["core","ideas"],["core","risk"],["core","you"],["core","claude"],["core","budget"],["ideas","risk"],["budget","risk"],["risk","place"],["risk","broker"],["you","place"],["you","broker"],
  ["claude","manage"],["claude","bench"],["session","scanner"],["session","broker"],["updates","core"],
  ["prices","trend"],["trend","risk"],["trend","place"],["capital","breaker"],["breaker","place"],["breaker","alerts"],
@@ -630,6 +631,11 @@ function mindStatus(){
   st.lab={c:(SL.ready||[]).length?"wait":"ok",t:SL.made?`${Object.keys(SL.groups||{}).length} tested`:"Fridays",d:["Replays whole strategy families (momentum, mean reversion, trend, breakout, pairs, carry and more) on 5 years of every market, with the last 120 days sealed.",SL.ready&&SL.ready.length?`Passed the tests: ${SL.ready.map(x=>x.slice(6)).join(", ")}.`:"No family has passed all tests yet."],go:"rules"};
   st.holdout={c:"ok",t:`${G.holdout_looks??0} looks used`,d:["The last 120 days are sealed. A candidate gets ONE look: pass = proven, fail = retired for good, too few trades = wait.",...(G.holdout_results||[]).map(r=>`${String(r.k).replace(/^strat:|^group:|^market:/,"")}: ${r.verdict}${r.mean_r!=null?" ("+(r.mean_r>=0?"+":"")+r.mean_r+"R, n="+r.n+")":""}`)],go:"rules"};
   st.drift={c:/DRIFT/.test(DR.verdict||"")?"bad":DR.made?"ok":"idle",t:DR.made?`spread ${DR.real_vs_assumed_spread_x??"–"}×`:"daily",d:["Checks real trades against the plan: entry slippage, real vs assumed spread, and the real result vs its paper twin.",DR.verdict?`${DR.verdict} (${DR.closed_trades} trades; slippage ${DR.avg_slippage_r}R).`:"Runs daily."],go:"rules"};
+  { const SH=S.shadow||{}, A=SH.all||{};
+    st.shadow={c:SH.made?((A.n||0)>=10&&A.mean_r<0?"wait":"ok"):"idle",t:SH.made?`${SH.watching} following · ${SH.settled} done`:"hourly",
+      d:["Follows every idea on every market without money, placed or blocked, settled like a real trade (spread and nightly funding charged). The outcomes train the models and show whether each rule blocks losers or winners.",
+         SH.made?`Following ${SH.watching} now; ${SH.settled} settled${A.n?`, average ${(A.mean_r>=0?"+":"")+A.mean_r}R a trade`:""}.`:"Starts with the next hourly run.",
+         ...(SH.ideas||[]).slice(0,2)],go:"rules"}; }
   st.dataset={c:G.dataset_rows?"ok":"idle",t:`${G.dataset_rows||0} records`,d:["Every decision saved with what the system saw, what it chose and what happened, plus plain-language question/answer pairs to train a local model on later.",`${G.dataset_rows||0} decisions so far; it grows every hour.`]};
   const sig=G.trend_signals||[];
   st.trend={c:sig.length?"ok":"wait",t:sig.length?`${sig.length} signal(s)`:"waiting breakout",d:["Forward test on Binance's fake-money exchange: buy BTC or ETH when it closes above its 55-day high; exit on a close below the 20-day low or after 80 days. $1 stake, same approvals and caps.",sig.length?`Recent signals: ${sig.map(x=>x.pair+" "+x.day).join(", ")}.`:"No breakout yet: a few signals per coin per year is normal."]};
