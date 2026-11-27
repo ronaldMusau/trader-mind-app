@@ -128,7 +128,7 @@ input[type=range]{width:100%;accent-color:var(--green);margin:8px 0 0;padding:0;
 <header>
   <svg width="26" height="26" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#13202e"/><polyline points="96,340 196,250 266,300 416,150" fill="none" stroke="#34d399" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><circle cx="416" cy="150" r="28" fill="#eaf0f6"/></svg>
   <h1>Trader Mind</h1><span class="live" title="live"></span>
-  <span class="ver" id="ver">v29</span><span class="grow"></span><small id="updated" class="soft"></small>
+  <span class="ver" id="ver">v30</span><span class="grow"></span><small id="updated" class="soft"></small>
   <button class="iconbtn" id="gear" aria-label="Settings" onclick="show('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <button class="iconbtn" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
 </header>
@@ -286,7 +286,7 @@ const ICON = {
   forex:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`,
   commodity:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2" stroke-linejoin="round"><path d="M3 18l3-8h12l3 8z"/><path d="M8 10l2-5h4l2 5"/></svg>`,
   crypto:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8h3.5a2 2 0 0 1 0 4H10zM10 12h4a2 2 0 0 1 0 4h-4zM10 7v10M12 6v2M12 16v2"/></svg>`};
-const VERSION="v29";
+const VERSION="v30";
 let state = {pg:{}, oc:"all", ticks:{}, rcls:"all", live:null, liveAt:0, cls:"all", st:"all", trades:[], approvals:{}, snap:{}, journal:[], view:"home", seen: JSON.parse(localStorage.getItem("tm_seen")||"{}")};
 
 function renderPendingSoon(){ setTimeout(()=>{ if(state.trades.length) renderPending(); },0); }
@@ -558,8 +558,9 @@ const MIND_NODES=[
  // deciding
  {id:"ideas",x:40,y:625,r:17,label:"Ideas",g:"decide"},{id:"risk",x:110,y:645,r:16,label:"Risk",g:"decide"},
  {id:"budget",x:180,y:655,r:15,label:"Budget",g:"decide"},{id:"you",x:250,y:645,r:17,label:"You",g:"decide"},{id:"claude",x:320,y:625,r:16,label:"Supervisor",g:"decide"},
- {id:"session",x:45,y:715,r:13,label:"Stock session",g:"decide"},{id:"trend",x:130,y:722,r:14,label:"Crypto trend",g:"decide"},
- {id:"breaker",x:220,y:722,r:14,label:"Breaker",g:"decide"},{id:"updates",x:310,y:715,r:13,label:"Skill updates",g:"decide"},
+ {id:"session",x:40,y:715,r:13,label:"Stock session",g:"decide"},{id:"trend",x:110,y:725,r:14,label:"Crypto trend",g:"decide"},
+ {id:"filters",x:180,y:730,r:15,label:"Limits & filters",g:"decide"},
+ {id:"breaker",x:250,y:725,r:14,label:"Breaker",g:"decide"},{id:"updates",x:320,y:715,r:13,label:"Skill updates",g:"decide"},
  // acting
  {id:"place",x:40,y:812,r:16,label:"Placing",g:"act"},{id:"broker",x:110,y:827,r:15,label:"Broker",g:"act"},
  {id:"watch",x:180,y:832,r:16,label:"Watcher",g:"act"},{id:"manage",x:250,y:827,r:16,label:"Manage",g:"act"},{id:"alerts",x:320,y:812,r:15,label:"Alerts",g:"act"},
@@ -570,7 +571,7 @@ const MIND_EDGES=[["prices","study"],["prices","models"],["prices","ideas"],["pr
  ["regime","risk"],["regime","core"],["insider","core"],["congress","core"],["earnings","core"],["insider","scanner"],["earnings","scanner"],["dataguard","ideas"],["dataguard","core"],["prices","dataguard"],
  ["study","models"],["models","bench"],["models","core"],["bench","core"],["ready","core"],["study","core"],["prices","core"],["capital","core"],["binance","core"],["calendar","core"],
  ["scanner","entry"],["entry","exit"],["exit","tm"],["tm","core"],["agents","core"],
- ["lab","bench"],["lab","core"],["holdout","lab"],["holdout","bench"],["drift","core"],["manage","drift"],["core","dataset"],["dataset","models"],["ideas","shadow"],["prices","shadow"],["shadow","models"],["shadow","bench"],
+ ["lab","bench"],["lab","core"],["holdout","lab"],["holdout","bench"],["drift","core"],["manage","drift"],["core","dataset"],["dataset","models"],["ideas","shadow"],["prices","shadow"],["shadow","models"],["shadow","bench"],["ideas","filters"],["filters","place"],["risk","filters"],
  ["core","ideas"],["core","risk"],["core","you"],["core","claude"],["core","budget"],["ideas","risk"],["budget","risk"],["risk","place"],["risk","broker"],["you","place"],["you","broker"],
  ["claude","manage"],["claude","bench"],["session","scanner"],["session","broker"],["updates","core"],
  ["prices","trend"],["trend","risk"],["trend","place"],["capital","breaker"],["breaker","place"],["breaker","alerts"],
@@ -631,6 +632,11 @@ function mindStatus(){
   st.lab={c:(SL.ready||[]).length?"wait":"ok",t:SL.made?`${Object.keys(SL.groups||{}).length} tested`:"Fridays",d:["Replays whole strategy families (momentum, mean reversion, trend, breakout, pairs, carry and more) on 5 years of every market, with the last 120 days sealed.",SL.ready&&SL.ready.length?`Passed the tests: ${SL.ready.map(x=>x.slice(6)).join(", ")}.`:"No family has passed all tests yet."],go:"rules"};
   st.holdout={c:"ok",t:`${G.holdout_looks??0} looks used`,d:["The last 120 days are sealed. A candidate gets ONE look: pass = proven, fail = retired for good, too few trades = wait.",...(G.holdout_results||[]).map(r=>`${String(r.k).replace(/^strat:|^group:|^market:/,"")}: ${r.verdict}${r.mean_r!=null?" ("+(r.mean_r>=0?"+":"")+r.mean_r+"R, n="+r.n+")":""}`)],go:"rules"};
   st.drift={c:/DRIFT/.test(DR.verdict||"")?"bad":DR.made?"ok":"idle",t:DR.made?`spread ${DR.real_vs_assumed_spread_x??"–"}×`:"daily",d:["Checks real trades against the plan: entry slippage, real vs assumed spread, and the real result vs its paper twin.",DR.verdict?`${DR.verdict} (${DR.closed_trades} trades; slippage ${DR.avg_slippage_r}R).`:"Runs daily."],go:"rules"};
+  { const FL=S.filters||{}, cn=FL.counts||{}, tot=Object.values(cn).reduce((a,b)=>a+b,0);
+    st.filters={c:FL.made?(tot?"wait":"ok"):"idle",t:FL.made?`${tot} held/blocked · 7 d`:"hourly",
+      d:["Checks every trade just before it is placed: at most 4 trades leaning the same way on one currency and 2 in one group (metals, energy, US tech, indices); no new entries in the rollover hour, after 19:00 UTC Friday, around high-impact news or with a spread over 2x normal (these hold the idea and retry next hour); and the expected profit must still clear its bar after 2 nights' funding or Binance fees.",
+         tot?"Last 7 days: "+Object.entries(cn).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(" · ")+".":"Nothing held or blocked in the last 7 days.",
+         ...(FL.recent||[]).slice(0,3).map(x=>`${(x.pair||"").replace("_","/")} ${x.side||""}: ${x.why}`)],go:"ideas"}; }
   { const SH=S.shadow||{}, A=SH.all||{};
     st.shadow={c:SH.made?((A.n||0)>=10&&A.mean_r<0?"wait":"ok"):"idle",t:SH.made?`${SH.watching} following · ${SH.settled} done`:"hourly",
       d:["Follows every idea on every market without money, placed or blocked, settled like a real trade (spread and nightly funding charged). The outcomes train the models and show whether each rule blocks losers or winners.",
@@ -900,6 +906,7 @@ function renderResults(){
   const wins=C.filter(t=>t.pnl_usd>0).length, pf=losses?gains/Math.abs(losses):null;
   $("#rhero").innerHTML=`<div class="k">Net result${state.rcls!=="all"?" · "+CLASSES[state.rcls]:""}</div><div class="big ${net>=0?"pos":"neg"}">${money(net)}</div>
     <small class="soft">${C.length} closed trades · ${C.length?Math.round(100*wins/C.length):0}% winners${pf!=null?` · profit factor ${pf.toFixed(2)}`:""}</small>
+    ${(()=>{const P=(state.snap.funding||{}).paid; return P&&P.amount!=null?`<br><small class="soft">Nightly funding charged by the broker so far: <b class="${P.amount<0?"neg":"pos"}">${P.currency==="KES"?"KSh ":""}${(+P.amount).toFixed(2)}${P.usd!=null?` (${money(P.usd)})`:""}</b> over ${P.charges} charges (already inside the balance)</small>`:""})()}
     <div style="display:flex;height:12px;border-radius:7px;overflow:hidden;margin-top:12px;background:#223043"><div style="width:${gains+Math.abs(losses)?100*gains/(gains+Math.abs(losses)):0}%;background:var(--green);transition:width 1s"></div><div style="flex:1;background:${losses?"var(--red)":"transparent"}"></div></div>`;
   $("#rsplit").innerHTML=`<div class="card"><div class="k">Gained</div><div class="pos" style="font-size:24px;font-weight:800">${money(gains)}</div><small class="soft">${wins} winning trades</small></div>
     <div class="card"><div class="k">Lost</div><div class="neg" style="font-size:24px;font-weight:800">${money(losses)}</div><small class="soft">${C.length-wins} losing trades</small></div>`;
@@ -969,6 +976,13 @@ function newsLine(pair,side){ const n=newsOf(pair); if(!n) return "";
   const v=+n.score, lean=v>=0.2?"bullish":v<=-0.2?"bearish":"neutral", agree=side?((side==="buy"?1:-1)*v):0;
   const tag=side?(agree>=0.2?`<span class="pos">agrees with this ${side}</span>`:agree<=-0.2?`<span class="neg">against this ${side}</span>`:`<span class="soft">no clear lean</span>`):"";
   return `<div class="newsl"><span class="nb ${v>=0.2?"up":v<=-0.2?"dn":""}">News ${v>=0?"+":""}${v.toFixed(2)} ${lean}</span> ${tag}<br><small class="soft">${esc(n.reason||"")} · ${esc(n.model||"")} · on trial, not used to decide</small></div>`; }
+function holdCost(t){   // expected holding cost in R (positive = cost), the same sum the PC checks before placing
+  const e=+t.entry, d=Math.abs(+t.entry-(+t.stop)); if(!e||!d) return null;
+  if(t.asset_class==="crypto") return 2*0.001*e/d;
+  const F=((state.snap.funding||{}).pct_per_night||{})[t.instrument]; if(!F) return null;
+  const rate=t.side==="buy"?F.long:F.short; if(rate==null) return null;
+  return -(+rate)/100*e/d*2;
+}
 function ideaCard(t){
   const min=Math.max(0.01,+t.stake_min||0), max=+t.stake_max||4;
   const st=state.stakes[t.id] ?? +t.stake_default ?? min;
@@ -983,6 +997,8 @@ function ideaCard(t){
    <div class="prob"><div class="rng" style="left:${lo*100}%;width:${(hi-lo)*100}%"></div><div class="be" style="left:${be*100}%" title="break-even"></div><div class="pt" style="left:calc(${p*100}% - 2px)"></div></div>
    <div class="range-l"><span>0%</span><span class="amb">break-even ${Math.round(be*100)}%</span><span>100%</span></div>
    <div class="row between" style="margin-top:10px"><span class="soft">Average result per $1 risked</span><b class="${(t.exp_r||0)>0?"pos":"neg"}">${(t.exp_r>0?"+":"")}${(+t.exp_r||0).toFixed(2)}</b></div>
+   ${(()=>{const c=holdCost(t); if(c==null) return ""; const net=(+t.exp_r||0)-c;
+     return `<div class="row between" style="margin-top:4px"><span class="soft">After holding costs <small>(${t.asset_class==="crypto"?"Binance fees":"2 nights' funding"} ${c>=0?"−":"+"}${Math.abs(c).toFixed(3)})</small></span><b class="${net>0?"pos":"neg"}">${(net>0?"+":"")}${net.toFixed(2)}</b></div>`;})()}
    ${newsLine(t.instrument,t.side)}
    ${/^Held:/.test(t.expectation||"")?`<div class="sug" style="margin-top:8px"><small>⏸ ${esc(t.expectation.split(". Expires")[0])}. Tried again next hour.</small></div>`:""}
    <div class="k" style="margin-top:14px">Your stake (max loss)</div>
