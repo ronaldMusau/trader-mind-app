@@ -1,11 +1,12 @@
 // watch: checks Ronald's open Capital.com DEMO trades every minute (called by pg_cron) and acts at once.
-// It can ONLY reduce risk: move a stop to breakeven, or close a trade whose profit is fading.
+// It can ONLY reduce risk: move a stop to breakeven, or raise a winner's stop behind the price (v3: let winners run).
 // It never opens, adds to or enlarges a trade. Demo host only. The hourly manager (capital_demo.py manage)
 // keeps the slower rules (trend flip, 72 h limit). When a trade's position is gone at the broker, this watcher also
 // records the real exit (price, reason, R, P/L) so the app stays true even when Ronald's PC is off (Lesson 40).
 // Secrets: CAPITAL_API_KEY, CAPITAL_LOGIN, CAPITAL_API_PASSWORD, WATCH_KEY, NTFY_TOPIC (+ built-in SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)
 const DEMO = "https://demo-api-capital.backend-capital.com"; // demo only, on purpose
-const BREAKEVEN_AT_R = 1.0, FADE_PEAK_R = 0.8, FADE_EXIT_R = 0.25; // same numbers as the hourly manager (v2 rules)
+const BREAKEVEN_AT_R = 1.0;                                // same numbers as the hourly manager (v3 rules, 2026-11-28)
+const RUN_AT_R = 1.5, RUN_LOCK_R = 1.2, RUN_TRAIL_R = 0.5;  // let winners run: at +1.5R the stop goes to +1.2R, then trails 0.5R behind the best price
 const SB = Deno.env.get("SUPABASE_URL")!, KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const sbh = { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" };
 
@@ -131,18 +132,23 @@ Deno.serve(async (req) => {
       const s = state[t.id] ?? { trade_id: t.id, peak_r: 0, be_done: false };
       const peak = Math.max(+s.peak_r || 0, r);
       let action: string | null = null;
-      if (peak >= FADE_PEAK_R && r > 0 && r <= FADE_EXIT_R) {
-        await cap("DELETE", "/api/v1/positions/" + t.deal_id);
-        action = `closed: profit fading (peak +${peak.toFixed(2)}R, now +${r.toFixed(2)}R)`;
-        await alert(`Closed ${t.side.toUpperCase()} ${t.instrument.replace("_", "/")} (watcher)`, `Banked the profit at ${price}: ${action}.`, loud);
-      } else if (r >= BREAKEVEN_AT_R && !s.be_done && Math.abs(+(pos.stopLevel ?? 0) - entry) > risk * 0.05) {
+      const curStop = pos.stopLevel != null ? +pos.stopLevel : null;
+      const haveR = curStop != null ? (long ? curStop - entry : entry - curStop) / risk : -1;
+      const wantR = peak >= RUN_AT_R ? Math.max(RUN_LOCK_R, peak - RUN_TRAIL_R) : null;
+      const open = String(p.market.marketStatus ?? "TRADEABLE").toUpperCase() === "TRADEABLE";
+      if (open && wantR != null && wantR > haveR + 0.02 && r > wantR) {   // only ever tighten, never past the price
+        const lvl = long ? entry + wantR * risk : entry - wantR * risk;
+        await cap("PUT", "/api/v1/positions/" + t.deal_id, { stopLevel: +lvl.toFixed(6), profitLevel: pos.profitLevel });
+        action = `stop raised to +${wantR.toFixed(2)}R (best +${peak.toFixed(2)}R): letting the winner run`;
+        if (haveR < RUN_LOCK_R) await alert(`Winner running ${t.side.toUpperCase()} ${t.instrument.replace("_", "/")}`, `Target passed; profit locked at +${wantR.toFixed(2)}R and the stop now follows the price.`, loud);
+      } else if (open && r >= BREAKEVEN_AT_R && haveR < 0 && !s.be_done && Math.abs(+(pos.stopLevel ?? 0) - entry) > risk * 0.05) {
         await cap("PUT", "/api/v1/positions/" + t.deal_id, { stopLevel: entry, profitLevel: pos.profitLevel });
         action = `stop moved to breakeven at +${r.toFixed(2)}R`;
         await alert(`Protected ${t.side.toUpperCase()} ${t.instrument.replace("_", "/")}`, `Worst case is now about $0: ${action}.`, loud);
       }
       await sb("watch_state?on_conflict=trade_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify({ trade_id: t.id, peak_r: +peak.toFixed(3), last_r: +r.toFixed(3),
-          be_done: s.be_done || (action?.startsWith("stop moved") ?? false),
+          be_done: s.be_done || (action?.startsWith("stop moved") ?? false) || (action?.startsWith("stop raised") ?? false),
           ...(action ? { action, acted_at: new Date().toISOString() } : {}), updated_at: new Date().toISOString() }) });
       if (action) done.push(t.instrument + ": " + action);
     }
